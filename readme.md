@@ -77,6 +77,11 @@ This layout will allow TeamFuse to **scale easily** in future sprints — enabli
 
 ---
 
+## LLD
+https://www.figma.com/design/1XKXXtjbzosqgQ1hcjJQc9/Untitled?node-id=0-1&t=lii0cBLhZmT1hDsQ-1
+
+https://www.figma.com/proto/1XKXXtjbzosqgQ1hcjJQc9/Untitled?page-id=0%3A1&node-id=5-19&p=f&viewport=-540%2C-278%2C0.25&t=5sXF9xDsJaCC7K76-1&scaling=min-zoom&content-scaling=fixed
+
 ##  Screenshot of Local App Running
 
 ![alt text](image-1.png)
