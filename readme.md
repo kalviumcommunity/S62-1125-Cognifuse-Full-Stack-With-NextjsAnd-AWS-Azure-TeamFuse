@@ -1,13 +1,14 @@
 ## 🧠 Project Title & Problem Statement
 
 **TeamFuse** is a productivity and collaboration platform that helps student and developer teams track progress, manage tasks, and visualize contributions effectively.  
-It addresses the problem of **limited visibility into individual engagement**, **communication gaps**, and **unbalanced workloads** within group projects.  
+It addresses the problem of **limited visibility into individual engagement**, **communication gaps**, and **unbalanced workloads** within group projects.
 
 The platform enables:
-- Real-time project updates and activity tracking  
-- Task assignment with performance scoring  
-- GitHub and Google Docs integration  
-- Visual dashboards for contribution analytics  
+
+- Real-time project updates and activity tracking
+- Task assignment with performance scoring
+- GitHub and Google Docs integration
+- Visual dashboards for contribution analytics
 
 By combining these, TeamFuse ensures **transparent, data-driven teamwork** and improved project outcomes.
 
@@ -22,21 +23,21 @@ src/
 ├── lib/          # Utility functions, configurations, and helper logic
 ├── styles/       # Global styles and Tailwind configuration
 ├── public/       # Static assets (images, icons, and logos)
-````
+```
 
 ### Description:
 
-* **app/** → Defines routes and page layouts for better navigation.
-* **components/** → Promotes reusability and clean, consistent UI design.
-* **lib/** → Contains shared logic, configurations, and API helpers.
-* **styles/** → Stores Tailwind and global styling files for theme control.
-* **public/** → Holds static assets accessible throughout the app.
+- **app/** → Defines routes and page layouts for better navigation.
+- **components/** → Promotes reusability and clean, consistent UI design.
+- **lib/** → Contains shared logic, configurations, and API helpers.
+- **styles/** → Stores Tailwind and global styling files for theme control.
+- **public/** → Holds static assets accessible throughout the app.
 
 This modular structure helps maintain **clarity**, **scalability**, and **team collaboration** throughout the development cycle.
 
 ---
 
-##  Setup Instructions
+## Setup Instructions
 
 Follow these steps to set up and run the project locally:
 
@@ -64,30 +65,66 @@ Now open your browser and go to **[http://localhost:3000](http://localhost:3000)
 
 ---
 
-##  Reflection
+## Reflection
 
 This project structure ensures **clear separation of concerns**, making it easier for each team member to work on different parts without conflicts.
 
-* The **app/** directory organizes routes efficiently using the Next.js App Router.
-* The **components/** folder promotes reusability and reduces UI redundancy.
-* The **lib/** folder centralizes configurations and helper functions for maintainability.
-
+- The **app/** directory organizes routes efficiently using the Next.js App Router.
+- The **components/** folder promotes reusability and reduces UI redundancy.
+- The **lib/** folder centralizes configurations and helper functions for maintainability.
 
 This layout will allow TeamFuse to **scale easily** in future sprints — enabling faster feature additions, smoother backend integration, and efficient deployment to AWS/Azure.
 
 ---
 
 ## LLD
+
 https://www.figma.com/design/1XKXXtjbzosqgQ1hcjJQc9/Untitled?node-id=0-1&t=lii0cBLhZmT1hDsQ-1
 
 https://www.figma.com/proto/1XKXXtjbzosqgQ1hcjJQc9/Untitled?page-id=0%3A1&node-id=5-19&p=f&viewport=-540%2C-278%2C0.25&t=5sXF9xDsJaCC7K76-1&scaling=min-zoom&content-scaling=fixed
 
-##  Screenshot of Local App Running
+## Screenshot of Local App Running
 
 ![alt text](image-1.png)
 
 ---
 
+## TypeScript & ESLint Configuration
 
+### Strict TypeScript
 
+Enabled strict mode in tsconfig.json to catch type errors early and prevent unused code.
 
+This improves reliability and reduces runtime bugs.
+
+### ESLint + Prettier
+
+Configured ESLint and Prettier for consistent, clean code.
+
+- ESLint catches syntax and logic issues.
+
+- Prettier formats code automatically.
+
+```json
+"extends": ["next/core-web-vitals", "plugin:prettier/recommended"]
+```
+
+### Pre-Commit Hooks
+
+Set up Husky and lint-staged to auto-fix code before every commit.
+
+This keeps all commits linted, formatted, and error-free.
+
+```json
+"lint-staged": {
+  "teamfuse/**/*.{ts,tsx,js,jsx}": [
+    "cd teamfuse && npx eslint --fix",
+    "cd teamfuse && npx prettier --write"
+  ]
+}
+```
+
+### Result
+
+Strict typing + linting + auto-formatting =
+clean, consistent, and bug-free code for the whole team.
