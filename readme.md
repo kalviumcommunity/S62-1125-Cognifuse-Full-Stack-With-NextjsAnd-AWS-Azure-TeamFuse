@@ -1,4 +1,4 @@
-## 🧠 Project Title & Problem Statement
+## Project Title & Problem Statement
 
 **TeamFuse** is a productivity and collaboration platform that helps student and developer teams track progress, manage tasks, and visualize contributions effectively.  
 It addresses the problem of **limited visibility into individual engagement**, **communication gaps**, and **unbalanced workloads** within group projects.  
@@ -60,7 +60,7 @@ npm install
 npm run dev
 ```
 
-Now open your browser and go to **[http://localhost:3000](http://localhost:3000)** — your app should be running successfully.
+Now opening browser and going to **[http://localhost:3000](http://localhost:3000)** — app runs successfully.
 
 ---
 
@@ -85,4 +85,52 @@ This layout will allow TeamFuse to **scale easily** in future sprints — enabli
 
 
 
+## Branching Strategy & Naming Conventions
 
+To maintain a clean and professional Git workflow, TeamFuse follows a consistent branching strategy.  
+Each branch name clearly indicates its purpose, making collaboration and reviews easier.
+
+### 🔹 Branch Naming Format
+
+feature/<feature-name> → For new features
+fix/<bug-name> → For bug fixes
+chore/<task-name> → For maintenance tasks
+docs/<update-name> → For documentation updates
+
+bash
+
+
+### 🔹 Examples
+| Branch Type | Example | Purpose |
+|--------------|----------|----------|
+| feature | feature/github-integration | Add GitHub API for contribution tracking |
+| feature | feature/task-dashboard | Create task management & analytics dashboard |
+| fix | fix/chat-reconnection-bug | Fix chat disconnection issue |
+| chore | chore/setup-prisma-schema | Update Prisma schema and configurations |
+| docs | docs/update-readme | Update documentation and README content |
+
+###  Reflection
+This branching structure helps our team:
+- Keep commits organized by purpose  
+- Simplify code reviews and pull requests  
+- Prevent conflicts and direct changes to the main branch  
+- Scale easily as our codebase and team grow  
+
+Following this structure ensures consistency, traceability, and cleaner collaboration across all future sprints.
+
+
+
+## Code Review Checklist
+
+Before submitting your Pull Request (PR), make sure you’ve verified the following:
+
+- [ ] Code runs without errors locally  
+- [ ] Follows the established folder structure and naming conventions  
+- [ ] No unused files, variables, or console logs  
+- [ ] Comments added where logic might not be immediately clear  
+- [ ] UI matches design or mockup closely  
+- [ ] README and PR description updated with latest info  
+- [ ] Screenshots added (if UI feature)  
+- [ ] Reflections or notes included for team discussion  
+
+This checklist ensures that all contributions maintain consistency, readability, and quality across the TeamFuse project.
