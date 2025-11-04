@@ -99,7 +99,6 @@ Before submitting your Pull Request (PR), make sure you’ve verified the follow
 - [ ] Screenshots added (if UI feature)  
 - [ ] Reflections or notes included for team discussion  
 
-
 This checklist ensures that all contributions maintain consistency, readability, and quality across the TeamFuse project.
 
 
