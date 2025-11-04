@@ -1,4 +1,4 @@
-## 🧠 Project Title & Problem Statement
+## Project Title & Problem Statement
 
 **TeamFuse** is a productivity and collaboration platform that helps student and developer teams track progress, manage tasks, and visualize contributions effectively.  
 It addresses the problem of **limited visibility into individual engagement**, **communication gaps**, and **unbalanced workloads** within group projects.
@@ -61,7 +61,7 @@ npm install
 npm run dev
 ```
 
-Now open your browser and go to **[http://localhost:3000](http://localhost:3000)** — your app should be running successfully.
+Now opening browser and going to **[http://localhost:3000](http://localhost:3000)** — app runs successfully.
 
 ---
 
@@ -94,6 +94,63 @@ https://www.figma.com/proto/1XKXXtjbzosqgQ1hcjJQc9/Untitled?page-id=0%3A1&node-i
 ### Strict TypeScript
 
 Enabled strict mode in tsconfig.json to catch type errors early and prevent unused code.
+
+## Code Review Checklist
+
+Before submitting your Pull Request (PR), make sure you’ve verified the following:
+
+- [ ] Code runs without errors locally  
+- [ ] Follows the established folder structure and naming conventions  
+- [ ] No unused files, variables, or console logs  
+- [ ] Comments added where logic might not be immediately clear  
+- [ ] UI matches design or mockup closely  
+- [ ] README and PR description updated with latest info  
+- [ ] Screenshots added (if UI feature)  
+- [ ] Reflections or notes included for team discussion  
+
+This checklist ensures that all contributions maintain consistency, readability, and quality across the TeamFuse project.
+
+
+## Branching Strategy & Naming Conventions
+
+To maintain a clean and professional Git workflow, TeamFuse follows a consistent branching strategy.  
+Each branch name clearly indicates its purpose, making collaboration and reviews easier.
+
+### 🔹 Branch Naming Format
+
+- feature/admin-ruleset-management, feature/user-dashboard, feature/login-auth → For developing new modules or adding new functionalities to the Cognifuse project.
+
+- fix/ruleset-display-error, fix/api-authentication-failure → For resolving bugs, UI issues, or fixing existing code errors.
+
+- chore/env-setup, chore/dependency-update, chore/build-optimization → For configuration updates, refactoring, or maintenance-related improvements.
+
+
+- docs/pr-guidelines, docs/readme-update, docs/setup-instructions → For updating documentation, guides, or workflow-related information.
+
+
+###  PR Template
+Stored in `.github/pull_request_template.md`
+
+###  Code Review Checklist
+(Include the checklist added above)
+
+###  Reflection
+This branching structure helps our team:
+- Keep commits organized by purpose  
+- Simplify code reviews and pull requests  
+- Prevent conflicts and direct changes to the main branch  
+- Scale easily as our codebase and team grow  
+
+Following this structure ensures consistency, traceability, and cleaner collaboration across all future sprints.
+
+### Screenshots
+
+- Screenshot of branch protection
+![alt text](image-2.png)
+
+
+- Screenshot of a PR showing checks/review approval
+![alt text](image-3.png
 
 This improves reliability and reduces runtime bugs.
 
@@ -140,3 +197,4 @@ $ git commit -m "Checking EsLint Setup"
 [EsLint 502bd23] Checking EsLint Setup
  1 file changed, 1 insertion(+)
 ```
+
