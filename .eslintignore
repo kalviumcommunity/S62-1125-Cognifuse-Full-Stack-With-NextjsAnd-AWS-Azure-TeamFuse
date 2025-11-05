@@ -1,0 +1,2 @@
+# Ignore Prisma generated files
+teamfuse/prisma/src/generated/

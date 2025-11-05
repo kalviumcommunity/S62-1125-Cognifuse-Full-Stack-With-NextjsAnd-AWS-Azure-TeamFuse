@@ -1,0 +1,27 @@
+# --- Base Image ---
+FROM node:20
+
+# --- Working Directory inside the Container ---
+WORKDIR /app
+
+# --- Install Dependencies (only package*.json first for caching) ---
+COPY package*.json ./
+RUN npm install
+
+# --- Copy Prisma schema and generate Prisma client BEFORE copying full project ---
+COPY prisma ./prisma
+
+# Prisma must generate Linux-compatible binaries inside Docker
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+# --- Copy the rest of the project ---
+COPY . .
+
+# --- Build Next.js App ---
+RUN npm run build
+
+# --- Expose App Port ---
+EXPOSE 3000
+
+# --- Start App in Production Mode ---
+CMD ["npm", "run", "start"]
