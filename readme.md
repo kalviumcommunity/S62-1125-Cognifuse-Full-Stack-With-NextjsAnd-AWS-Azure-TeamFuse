@@ -198,6 +198,68 @@ $ git commit -m "Checking EsLint Setup"
  1 file changed, 1 insertion(+)
 ```
 
+
+
+
+# Environment Variables Configuration for TeamFuse
+
+This document explains the environment variables needed for the **TeamFuse project**, their purposes, client vs server safety, how to replicate the setup using `.env.example`, and common pitfalls avoided.
+
+---
+
+## Purpose of Each Environment Variable
+
+| Variable | Purpose | Client-Side Safe? |
+|-----------|----------|------------------|
+| `DATABASE_URL` | MongoDB connection string used to connect the TeamFuse backend to the database | No (Server-side only) |
+| `JWT_SECRET` | Secret key for signing and verifying JSON Web Tokens during authentication | No (Server-side only) |
+| `NEXTAUTH_SECRET` | Secret used for encrypting and securing NextAuth sessions | No (Server-side only) |
+| `REDIS_URL` | Redis cache connection URL for improving performance and managing session storage | No (Server-side only) |
+| `NODE_ENV` | Defines whether the app is running in development or production mode | No (Server-side only) |
+| `UPI_SERVICE_URL` | API endpoint for handling UPI payment or verification services | No (Server-side only) |
+| `NEXTAUTH_URL` | Public URL of the TeamFuse application used for authentication callbacks | Yes (safe to expose if needed) |
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL used by the frontend to make API requests to the backend | Yes (safe to expose if needed) |
+
+---
+
+## Server-Side vs Client-Side Access
+
+- All environment variables except `NEXTAUTH_URL` and `NEXT_PUBLIC_API_BASE_URL` are **server-side only** and must not be exposed in client-side bundles.  
+- Ensure no sensitive variables have the `NEXT_PUBLIC_` prefix, as Next.js exposes those to the browser.  
+- Variables without the `NEXT_PUBLIC_` prefix are accessible only in API routes and server code via `process.env`.  
+- This separation protects secrets like database URLs, JWT secrets, and Redis connections from being exposed to users.
+
+---
+
+## How to Replicate the Setup Using `.env.example`
+
+1. Copy `.env.example` to `.env.local` in your project root.  
+2. Replace placeholder values with your actual credentials and secrets:  
+   - Update `DATABASE_URL` with your MongoDB connection string  
+   - Generate strong secrets for `JWT_SECRET` and `NEXTAUTH_SECRET`  
+   - Configure correct Redis connection URL (`REDIS_URL`)  
+   - Point `UPI_SERVICE_URL` to your actual service endpoint  
+   - Set `NEXTAUTH_URL` and `NEXT_PUBLIC_API_BASE_URL` according to your deployment environment  
+3. Add `.env.local` to your `.gitignore` file to prevent committing sensitive secrets to version control.  
+4. Restart your development or production server after modifying `.env.local` to ensure all variables load correctly.  
+5. For deployment, use your cloud provider’s environment variable configuration instead of local `.env` files.
+
+---
+
+## Common Pitfalls Avoided
+
+- **Exposing secrets accidentally**: No sensitive variables are prefixed with `NEXT_PUBLIC_`, avoiding client bundle exposure.  
+- **Accidental commits**: The `.env.local` file is excluded from version control while `.env.example` acts as a safe reference.  
+- **Runtime vs build-time issues**: Variables are accessed safely at runtime, preventing leakage during build.  
+- **Clear structure**: All variables follow consistent naming, making configuration simple for future developers.  
+- **Misconfiguration prevention**: Each variable’s role and exposure level are clearly documented.
+
+---
+
+This approach ensures secure and efficient environment management for **TeamFuse**, enabling safe scaling and easy onboarding for all contributors.
+
+---
+=======
 # 🐳 Docker Setup — Next.js + Prisma + PostgreSQL + Redis
 
 ## 📌 Overview
@@ -263,3 +325,4 @@ docker-compose up
 | Docker Compose failed to pull PostgreSQL image | Manually ran `docker pull postgres:15-alpine` or disabled BuildKit to avoid network pull issues  |
 | `.next` folder missing during runtime          | Removed `.next` from Docker volumes to prevent overwriting build output inside the container     |
 | Slow builds / large Docker context             | Added `.dockerignore` to exclude `node_modules/`, `.next/`, and `.git/` directories              |
+
