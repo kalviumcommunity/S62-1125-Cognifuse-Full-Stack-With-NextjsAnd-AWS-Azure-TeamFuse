@@ -4,5 +4,9 @@
     "no-console": "warn",
     "semi": ["error", "always"],
     "quotes": ["error", "double"]
-  }
+  },
+  "ignorePatterns": [
+  "src/generated/",
+  "src/generated/**"
+]
 }
