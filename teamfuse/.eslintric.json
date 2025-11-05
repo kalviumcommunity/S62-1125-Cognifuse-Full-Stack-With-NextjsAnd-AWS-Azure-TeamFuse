@@ -4,5 +4,8 @@
     "no-console": "warn",
     "semi": ["error", "always"],
     "quotes": ["error", "double"]
-  }
+  },
+  "ignorePatterns": [
+    "teamfuse/prisma/src/generated/**/*"
+  ]
 }

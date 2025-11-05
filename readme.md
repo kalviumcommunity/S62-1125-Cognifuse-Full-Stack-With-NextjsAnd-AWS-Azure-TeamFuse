@@ -99,17 +99,16 @@ Enabled strict mode in tsconfig.json to catch type errors early and prevent unus
 
 Before submitting your Pull Request (PR), make sure you’ve verified the following:
 
-- [ ] Code runs without errors locally  
-- [ ] Follows the established folder structure and naming conventions  
-- [ ] No unused files, variables, or console logs  
-- [ ] Comments added where logic might not be immediately clear  
-- [ ] UI matches design or mockup closely  
-- [ ] README and PR description updated with latest info  
-- [ ] Screenshots added (if UI feature)  
-- [ ] Reflections or notes included for team discussion  
+- [ ] Code runs without errors locally
+- [ ] Follows the established folder structure and naming conventions
+- [ ] No unused files, variables, or console logs
+- [ ] Comments added where logic might not be immediately clear
+- [ ] UI matches design or mockup closely
+- [ ] README and PR description updated with latest info
+- [ ] Screenshots added (if UI feature)
+- [ ] Reflections or notes included for team discussion
 
 This checklist ensures that all contributions maintain consistency, readability, and quality across the TeamFuse project.
-
 
 ## Branching Strategy & Naming Conventions
 
@@ -124,33 +123,34 @@ Each branch name clearly indicates its purpose, making collaboration and reviews
 
 - chore/env-setup, chore/dependency-update, chore/build-optimization → For configuration updates, refactoring, or maintenance-related improvements.
 
-
 - docs/pr-guidelines, docs/readme-update, docs/setup-instructions → For updating documentation, guides, or workflow-related information.
 
+### PR Template
 
-###  PR Template
 Stored in `.github/pull_request_template.md`
 
-###  Code Review Checklist
+### Code Review Checklist
+
 (Include the checklist added above)
 
-###  Reflection
+### Reflection
+
 This branching structure helps our team:
-- Keep commits organized by purpose  
-- Simplify code reviews and pull requests  
-- Prevent conflicts and direct changes to the main branch  
-- Scale easily as our codebase and team grow  
+
+- Keep commits organized by purpose
+- Simplify code reviews and pull requests
+- Prevent conflicts and direct changes to the main branch
+- Scale easily as our codebase and team grow
 
 Following this structure ensures consistency, traceability, and cleaner collaboration across all future sprints.
 
 ### Screenshots
 
 - Screenshot of branch protection
-![alt text](image-2.png)
-
+  ![alt text](image-2.png)
 
 - Screenshot of a PR showing checks/review approval
-![alt text](image-3.png
+  ![alt text](image-3.png
 
 This improves reliability and reduces runtime bugs.
 
@@ -198,3 +198,68 @@ $ git commit -m "Checking EsLint Setup"
  1 file changed, 1 insertion(+)
 ```
 
+# 🐳 Docker Setup — Next.js + Prisma + PostgreSQL + Redis
+
+## 📌 Overview
+
+This project uses Docker to containerize:
+
+- **Next.js app** (with Prisma ORM)
+- **PostgreSQL database**
+- **Redis** (for caching)
+
+All services run together using `docker-compose`.
+
+---
+
+## 📂 Dockerfile (What It Does)
+
+| Step                                 | Purpose                                       |
+| ------------------------------------ | --------------------------------------------- |
+| `COPY package*.json` + `npm install` | Installs dependencies                         |
+| `COPY prisma ./prisma`               | Copies Prisma schema **before build**         |
+| `RUN npx prisma generate`            | Generates Prisma Client with _Linux binaries_ |
+| `COPY . .`                           | Adds remaining project files                  |
+| `RUN npm run build`                  | Builds Next.js app for production             |
+| `CMD ["npm", "run", "start"]`        | Starts the app in production mode             |
+
+🔑 **Important:** Prisma must be generated _before copying the full project_, or Windows binaries overwrite Linux binaries.
+
+---
+
+## 🧩 docker-compose.yml (Services Explained)
+
+| Service | Image / Build        | Description                                         |
+| ------- | -------------------- | --------------------------------------------------- |
+| `app`   | Builds Dockerfile    | Runs Next.js (uses Prisma + connects to DB + Redis) |
+| `db`    | `postgres:15-alpine` | Stores application data                             |
+| `redis` | `redis:7-alpine`     | Used as cache layer                                 |
+
+### Networking / Volumes
+
+| Item       | Usage                                                           |
+| ---------- | --------------------------------------------------------------- |
+| `localnet` | A shared Docker network allowing services to talk to each other |
+| `db_data`  | Persistent volume for PostgreSQL data                           |
+
+---
+
+## 🛠 Running the Project
+
+```sh
+docker-compose build --no-cache
+docker-compose up
+```
+
+## Screenshot of Docker Container Running
+
+![Docker Logs](docker-setup.png)
+
+## 🚧 Issues Faced & Fixes
+
+| Issue                                          | Fix                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Prisma binary mismatch (`windows.dll.node`)    | Generated Prisma **inside Docker** and removed bind mount that overwrote the Linux Prisma client |
+| Docker Compose failed to pull PostgreSQL image | Manually ran `docker pull postgres:15-alpine` or disabled BuildKit to avoid network pull issues  |
+| `.next` folder missing during runtime          | Removed `.next` from Docker volumes to prevent overwriting build output inside the container     |
+| Slow builds / large Docker context             | Added `.dockerignore` to exclude `node_modules/`, `.next/`, and `.git/` directories              |

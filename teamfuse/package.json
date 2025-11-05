@@ -31,10 +31,13 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+ "lint-staged": {
+  "*.{ts,tsx,js,jsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "teamfuse/prisma/src/generated/**/*": "echo 'Skipping Prisma generated files'"
+}
+
+
 }

@@ -1,1 +1,4 @@
 node_modules/
+.env*
+
+teamfuse/prisma/src/generated/
