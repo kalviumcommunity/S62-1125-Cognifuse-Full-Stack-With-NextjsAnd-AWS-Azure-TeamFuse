@@ -263,3 +263,65 @@ docker-compose up
 | Docker Compose failed to pull PostgreSQL image | Manually ran `docker pull postgres:15-alpine` or disabled BuildKit to avoid network pull issues  |
 | `.next` folder missing during runtime          | Removed `.next` from Docker volumes to prevent overwriting build output inside the container     |
 | Slow builds / large Docker context             | Added `.dockerignore` to exclude `node_modules/`, `.next/`, and `.git/` directories              |
+
+# ✅ Global API Response Handler (Next.js + Prisma)
+
+This project uses a **standardized API response format** for all endpoints to improve consistency, debuggability, and observability.
+
+---
+
+## ✅ Response Envelope Format
+
+### ✅ Success Response
+
+```json
+{
+  "success": true,
+  "message": "Users fetched successfully",
+  "data": [...],
+  "timestamp": "2025-11-05T12:52:01.230Z"
+}
+```
+
+### ❌ Error Response
+
+```json
+{
+  "success": false,
+  "message": "Failed to fetch user",
+  "error": { "code": "E003", "details": {} },
+  "timestamp": "2025-11-05T12:52:05.421Z"
+}
+```
+
+### 📦 Usage in Routes
+
+```json
+import { sendSuccess, sendError } from "@/lib/apiResponse";
+import { prisma } from "@/lib/prisma";
+
+export async function GET() {
+  try {
+    const users = await prisma.user.findMany();
+    return sendSuccess(users, "Users fetched successfully");
+  } catch (error) {
+    return sendError("Failed to fetch users", ERROR_CODES.DATABASE_FAILURE, error);
+  }
+}
+```
+
+### 🚨 Error Codes
+
+| Code | Meaning               |
+| ---- | --------------------- |
+| E001 | Validation error      |
+| E002 | Resource not found    |
+| E003 | Database failure      |
+| E500 | Internal server error |
+
+### ✨ Developer Experience Benefits
+
+- Consistent API response shape
+- Easier debugging in logs / error monitoring tools
+- Reduced boilerplate in route handlers
+- Error codes improve traceability and analytics

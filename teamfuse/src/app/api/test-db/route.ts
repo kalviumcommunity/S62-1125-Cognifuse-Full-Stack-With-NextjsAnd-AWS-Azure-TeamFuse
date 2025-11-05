@@ -1,15 +1,20 @@
 import { PrismaClient } from "@/generated/prisma";
-import { NextResponse } from "next/server";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
     const users = await prisma.user.findMany();
-    return NextResponse.json({ message: "Connected successfully!", users });
+    return sendSuccess(users, "Connected successfully!");
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    return sendError(
+      "Database connection failed",
+      "DB_CONNECTION_ERROR",
+      500,
+      error
+    );
   } finally {
     await prisma.$disconnect();
   }
