@@ -387,3 +387,119 @@ export async function GET() {
 - Easier debugging in logs / error monitoring tools
 - Reduced boilerplate in route handlers
 - Error codes improve traceability and analytics
+
+=======
+
+# Prisma ORM Setup & Database Integration
+
+This section documents how Prisma ORM was integrated into the TeamFuse project, the setup steps followed, how it connects to PostgreSQL, along with code snippets, logs, and reflections.
+
+## Purpose of Prisma in TeamFuse
+
+Prisma ORM is used to interact with the PostgreSQL database in a type-safe, efficient, and developer-friendly way. It eliminates the need to write raw SQL for most operations and provides auto-completion and schema-based query validation, improving backend reliability.
+
+##  Setup Steps Followed
+
+The following steps were completed to set up Prisma in the project:
+
+npm install prisma --save-dev
+npx prisma init
+
+
+This created:
+
+A prisma/ folder containing the schema.prisma file
+
+A DATABASE_URL entry inside .env
+
+After defining the schema models, Prisma Client was generated using:
+
+npx prisma generate
+
+
+The Prisma Client was generated in:
+
+/src/generated/prisma
+
+## Prisma Schema (Excerpt)
+
+Below is a short snippet from the schema.prisma that represents the core structure used in TeamFuse:
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  projects  Project[]
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  name      String
+  createdById String
+  createdAt DateTime @default(now())
+  tasks     Task[]
+  messages  Message[]
+}
+
+
+Full schema includes: User, Project, Task, Message, Feedback, ProjectMember, Insight, GitHubData, GoogleDocsData
+
+## Prisma Client Initialization
+
+A single Prisma instance was configured to prevent multiple database connections during development:
+
+import { PrismaClient } from "@prisma/client";
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ["query", "info", "warn", "error"],
+  });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+
+Prevents memory leaks during hot reload
+Ensures a single reusable Prisma instance
+Logs queries for debugging
+
+##  Testing the Database Connection
+
+A simple test query was used to ensure Prisma successfully connects to PostgreSQL:
+
+import { prisma } from "@/lib/prisma";
+
+export async function getUsers() {
+  const users = await prisma.user.findMany();
+  console.log(users);
+}
+
+
+Expected Output: A list of users printed in the terminal confirming successful connection.
+
+![alt text](image-4.png)
+
+##  Reflection
+
+Prisma greatly improves backend development for TeamFuse by providing:
+
+Benefit	Description
+Type Safety	Queries are validated at compile-time, reducing runtime errors
+Faster Development	No need to write SQL manually for common operations
+Auto-Generated Client	Strong typing and auto-complete for all models
+Easy Schema Evolution	Migrations keep database in sync with code
+Better Developer Experience	Prisma Studio makes DB inspection fast and visual
+
+=======
