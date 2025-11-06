@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, description, createdById } = body;
 
-    // ✅ Step 1: Check if the user exists
+    // if the user exists
     const userExists = await prisma.user.findUnique({
       where: { id: createdById },
     });
@@ -19,9 +19,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // ✅ Step 2: Use Prisma transaction
+    // Prisma transaction
     const result = await prisma.$transaction(async (tx) => {
-      // 1️⃣ Create the project
+      // Create project
       const project = await tx.project.create({
         data: {
           name,
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         },
       });
 
-      // 2️⃣ Add the creator as project member (Leader)
+      // Add creator as project member (Leader)
       await tx.projectMember.create({
         data: {
           userId: createdById,
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         },
       });
 
-      // 3️⃣ Create a welcome message
+      // Create welcome message
       await tx.message.create({
         data: {
           content: `Project "${name}" created successfully!`,
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, project: result });
   } catch (error: any) {
-    console.error("❌ Transaction failed. Rolling back...", error);
+    console.error(" Transaction failed. Rolling back...", error);
     return NextResponse.json(
       { success: false, message: error.message },
       { status: 500 }
