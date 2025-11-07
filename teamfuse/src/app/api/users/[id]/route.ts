@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   try {
@@ -11,10 +11,14 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         tasksAssigned: true,
       },
     });
-    if (!user) return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
-    return NextResponse.json({ success: true, user });
+
+    if (!user) {
+      return sendError("User not found", "NOT_FOUND", 404);
+    }
+
+    return sendSuccess(user, "User fetched successfully");
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return sendError(error.message, "FETCH_ERROR", 500, error);
   }
 }
 
@@ -25,17 +29,18 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       where: { id: params.id },
       data,
     });
-    return NextResponse.json({ success: true, user: updated });
+
+    return sendSuccess(updated, "User updated successfully");
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return sendError(error.message, "UPDATE_ERROR", 500, error);
   }
 }
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   try {
     await prisma.user.delete({ where: { id: params.id } });
-    return NextResponse.json({ success: true, message: "User deleted" });
+    return sendSuccess(null, "User deleted successfully");
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return sendError(error.message, "DELETE_ERROR", 500, error);
   }
 }

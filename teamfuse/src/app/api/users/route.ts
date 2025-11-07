@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 // GET all users
 export async function GET() {
@@ -9,9 +9,10 @@ export async function GET() {
       select: { id: true, name: true, email: true, role: true, createdAt: true },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ success: true, users });
+
+    return sendSuccess(users, "Users fetched successfully");
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return sendError(error.message, "FETCH_ERROR", 500, error);
   }
 }
 
@@ -25,8 +26,8 @@ export async function POST(request: Request) {
       data: { name, email, role, avatarUrl },
     });
 
-    return NextResponse.json({ success: true, user }, { status: 201 });
+    return sendSuccess(user, "User created successfully", 201);
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return sendError(error.message, "CREATE_ERROR", 500, error);
   }
 }

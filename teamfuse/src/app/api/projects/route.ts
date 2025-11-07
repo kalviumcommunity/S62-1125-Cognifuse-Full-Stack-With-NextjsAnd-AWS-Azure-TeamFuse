@@ -1,27 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, description, createdById } = body;
 
-    // if the user exists
     const userExists = await prisma.user.findUnique({
       where: { id: createdById },
     });
 
     if (!userExists) {
-      return NextResponse.json(
-        { success: false, message: "User not found. Cannot create project." },
-        { status: 400 }
-      );
+      return sendError("User not found. Cannot create project.", "USER_NOT_FOUND", 400);
     }
 
-    // Prisma transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Create project
       const project = await tx.project.create({
         data: {
           name,
@@ -30,7 +25,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // Add creator as project member (Leader)
       await tx.projectMember.create({
         data: {
           userId: createdById,
@@ -39,7 +33,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // Create welcome message
       await tx.message.create({
         data: {
           content: `Project "${name}" created successfully!`,
@@ -51,18 +44,12 @@ export async function POST(request: Request) {
       return project;
     });
 
-    return NextResponse.json({ success: true, project: result });
+    return sendSuccess(result, "Project created successfully");
   } catch (error: any) {
-    console.error(" Transaction failed. Rolling back...", error);
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
+    console.error("Transaction failed. Rolling back...", error);
+    return sendError(error.message, "CREATE_PROJECT_ERROR", 500, error);
   }
 }
-
-
-
 
 export async function GET() {
   try {
@@ -84,13 +71,9 @@ export async function GET() {
       take: 10,
     });
 
-    return NextResponse.json({ success: true, projects });
+    return sendSuccess(projects, "Projects fetched successfully");
   } catch (error: any) {
     console.error("Error fetching projects:", error);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return sendError(error.message, "FETCH_PROJECTS_ERROR", 500, error);
   }
 }
-
