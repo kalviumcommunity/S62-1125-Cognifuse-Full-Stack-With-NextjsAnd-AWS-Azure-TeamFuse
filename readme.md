@@ -503,3 +503,27 @@ Easy Schema Evolution	Migrations keep database in sync with code
 Better Developer Experience	Prisma Studio makes DB inspection fast and visual
 
 =======
+
+
+# Layout & Component Architecture — TeamFuse (Dual Layouts)
+
+This implements a **dual layout** structure aligned with TeamFuse flow:
+
+- **Public Layout** for `Landing (/), Auth (/auth)` — no sidebar/header  
+- **App Layout** for `Dashboard, Project, Chat, Tasks, GitHub Insights, Team Performance, My Performance, Feedback, Settings` — shared **Header + Sidebar**
+
+
+## Why this architecture?
+
+- **Reusability:** Header/Sidebar shared by all authenticated pages  
+- **Maintainability:** Update once → consistent across the app  
+- **Scalability:** Route groups `(public)` and `(app)` cleanly separate concerns  
+- **Accessibility:** Semantic structure, keyboard-friendly links, responsive drawer
+
+## How it renders
+
+- `app/(public)/layout.tsx` → wraps Landing + Auth (no chrome)  
+- `app/(app)/layout.tsx` → wraps all app pages with `LayoutWrapper` (Header + Sidebar)  
+- Sidebar links point to stubs you can extend.
+
+
