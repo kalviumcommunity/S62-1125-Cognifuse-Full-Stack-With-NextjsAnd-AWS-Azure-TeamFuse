@@ -13,25 +13,49 @@ export async function middleware(req: NextRequest) {
     req.cookies.get("access_token")?.value ||
     req.headers.get("authorization")?.replace("Bearer ", "");
 
-  if (!access) {
-    return NextResponse.redirect(redirectUrl);
+  const refresh = req.cookies.get("refresh_token")?.value;
+
+  console.log(`Access: ${!!access}, Refresh: ${!!refresh}`);
+
+  // ✅ 1. If access exists try verifying it
+  if (access) {
+    try {
+      await verifyAccess(access); // still valid
+      return NextResponse.next();
+    } catch (e) {
+      console.log("❌ Access token invalid or expired");
+    }
   }
 
-  try {
-    await verifyAccess(access);
-    return NextResponse.next();
-  } catch {
-    // try refreshing transparently (optional)
+  // ✅ 2. If refresh is available, try refreshing (only 1 call)
+  if (refresh) {
+    console.log("➡️ Trying refresh...");
+
     const refreshRes = await fetch(new URL("/api/auth/refresh", req.url), {
       method: "POST",
       headers: { cookie: req.headers.get("cookie") ?? "" },
     });
+
     if (refreshRes.ok) {
-      // let it proceed; browser will get new cookies
-      return NextResponse.next();
+      console.log("✅ Refresh succeeded. Forwarding new cookies.");
+
+      const res = NextResponse.next();
+
+      refreshRes.headers.forEach((value, key) => {
+        if (key.toLowerCase() === "set-cookie") {
+          res.headers.append("set-cookie", value);
+        }
+      });
+
+      return res;
     }
-    return NextResponse.redirect(redirectUrl);
+
+    console.log("⛔ Refresh failed.");
   }
+
+  // ✅ 3. No access token & refresh failed → go to login
+  console.log("⛔ Redirecting to login.");
+  return NextResponse.redirect(redirectUrl);
 }
 
 export const config = {
