@@ -1,7 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
   output        = "../src/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -10,24 +10,25 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(uuid())
+  id               String            @id @default(uuid())
   name             String
-  email            String          @unique
-  role             Role            @default(MEMBER)
+  email            String            @unique
+  role             Role              @default(MEMBER)
   avatarUrl        String?
-  oauthProvider    String          @default("github")
-  oauthId          String          @unique
-  refreshTokens    RefreshToken[]
-  createdAt        DateTime        @default(now())
-  feedbackGiven    Feedback[]      @relation("FeedbackGiven")
-  feedbackReceived Feedback[]      @relation("FeedbackReceived")
+  oauthProvider    String            @default("github")
+  oauthId          String            @unique
+  createdAt        DateTime          @default(now())
+  feedbackGiven    Feedback[]        @relation("FeedbackGiven")
+  feedbackReceived Feedback[]        @relation("FeedbackReceived")
   githubProfile    GitHubData?
   googleProfile    GoogleDocsData?
   messages         Message[]
-  projectsCreated  Project[]       @relation("ProjectsCreated")
+  projectsCreated  Project[]         @relation("ProjectsCreated")
   projects         ProjectMember[]
-  tasksAssigned    Task[]          @relation("AssignedTasks")
-  tasksCreated     Task[]          @relation("CreatedTasks")
+  refreshTokens    RefreshToken[]
+  tasksAssigned    Task[]            @relation("AssignedTasks")
+  tasksCreated     Task[]            @relation("CreatedTasks")
+  presenceSessions PresenceSession[]
 }
 
 model RefreshToken {
@@ -43,25 +44,25 @@ model RefreshToken {
   ipAddress       String?
   location        String?
   deviceName      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([hashedToken])
 }
 
 model Project {
-  id          String          @id @default(uuid())
-  name        String
-  description String?
-  createdById String
-  createdAt   DateTime        @default(now())
-  feedbacks   Feedback[]
-  insights    Insight[]
-  messages    Message[]
-  createdBy   User            @relation("ProjectsCreated", fields: [createdById], references: [id])
-  members     ProjectMember[]
-  tasks       Task[]
+  id               String            @id @default(uuid())
+  name             String
+  description      String?
+  createdById      String
+  createdAt        DateTime          @default(now())
+  feedbacks        Feedback[]
+  insights         Insight[]
+  messages         Message[]
+  createdBy        User              @relation("ProjectsCreated", fields: [createdById], references: [id])
+  members          ProjectMember[]
+  tasks            Task[]
+  presenceSessions PresenceSession[]
 
   @@index([createdById])
   @@index([createdAt])
@@ -145,6 +146,30 @@ model Feedback {
   fromUser   User     @relation("FeedbackGiven", fields: [fromUserId], references: [id])
   project    Project  @relation(fields: [projectId], references: [id])
   toUser     User     @relation("FeedbackReceived", fields: [toUserId], references: [id])
+}
+
+model PresenceSession {
+  id                 String         @id @default(uuid())
+  userId             String
+  projectId          String
+  status             PresenceStatus @default(OFFLINE)
+  startedAt          DateTime       @default(now())
+  endedAt            DateTime?
+  lastActive         DateTime       @default(now())
+  totalActiveMinutes Int?           @default(0)
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+enum PresenceStatus {
+  ONLINE
+  IDLE
+  OFFLINE
+  FOCUSED
 }
 
 enum Role {

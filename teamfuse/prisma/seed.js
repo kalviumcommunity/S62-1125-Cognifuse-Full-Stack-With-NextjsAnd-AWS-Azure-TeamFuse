@@ -12,8 +12,8 @@ async function main() {
     data: {
       name: "Luca Moretti",
       email: "luca.moretti@teamfuse.com",
-      role: "LEADER",
       avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg",
+      oauthId: "github_1",
     },
   });
 
@@ -21,8 +21,8 @@ async function main() {
     data: {
       name: "Sofia Delgado",
       email: "sofia.delgado@teamfuse.com",
-      role: "MEMBER",
       avatarUrl: "https://randomuser.me/api/portraits/women/45.jpg",
+      oauthId: "github_2",
     },
   });
 
@@ -30,8 +30,8 @@ async function main() {
     data: {
       name: "Akira Tanaka",
       email: "akira.tanaka@teamfuse.com",
-      role: "MEMBER",
       avatarUrl: "https://randomuser.me/api/portraits/men/52.jpg",
+      oauthId: "github_3",
     },
   });
 
@@ -39,7 +39,8 @@ async function main() {
   const project = await prisma.project.create({
     data: {
       name: "Global Collaboration Platform",
-      description: "A platform to manage remote engineering teams, feedback cycles, and project analytics.",
+      description:
+        "A platform to manage remote engineering teams, feedback cycles, and project analytics.",
       createdById: leader.id,
       members: {
         create: [
@@ -51,66 +52,71 @@ async function main() {
     },
   });
 
+  // --- PROJECT MEMBERS FETCH ---
+  const projectMembers = await prisma.projectMember.findMany({
+    where: { projectId: project.id },
+  });
+
+  const leaderMember = projectMembers.find((m) => m.userId === leader.id);
+  const member1Member = projectMembers.find((m) => m.userId === member1.id);
+  const member2Member = projectMembers.find((m) => m.userId === member2.id);
+
   // --- TASKS ---
-  const task1 = await prisma.task.create({
-    data: {
-      title: "Develop Authentication System",
-      description: "Set up secure user authentication using JWT and bcrypt.",
-      weight: 2.5,
-      status: "IN_PROGRESS",
-      projectId: project.id,
-      createdById: leader.id,
-      assignedToId: member1.id,
-    },
-  });
-
-  const task2 = await prisma.task.create({
-    data: {
-      title: "Design Project Dashboard",
-      description: "Implement frontend dashboard with React and Tailwind.",
-      weight: 1.8,
-      status: "PENDING",
-      projectId: project.id,
-      createdById: member1.id,
-      assignedToId: member2.id,
-    },
-  });
-
-  const task3 = await prisma.task.create({
-    data: {
-      title: "Integrate Feedback API",
-      description: "Connect the feedback module and test endpoints.",
-      weight: 2.0,
-      status: "COMPLETED",
-      projectId: project.id,
-      createdById: member2.id,
-      assignedToId: leader.id,
-      completionTime: 45,
-      peerScore: 9.2,
-      aiScore: 8.7,
-    },
+  await prisma.task.createMany({
+    data: [
+      {
+        title: "Develop Authentication System",
+        description: "Set up secure user authentication using JWT and bcrypt.",
+        weight: 2.5,
+        status: "IN_PROGRESS",
+        projectId: project.id,
+        createdById: leader.id,
+        assignedToId: member1.id,
+      },
+      {
+        title: "Design Project Dashboard",
+        description: "Implement frontend dashboard with React and Tailwind.",
+        weight: 1.8,
+        status: "PENDING",
+        projectId: project.id,
+        createdById: member1.id,
+        assignedToId: member2.id,
+      },
+      {
+        title: "Integrate Feedback API",
+        description: "Connect the feedback module and test endpoints.",
+        weight: 2.0,
+        status: "COMPLETED",
+        projectId: project.id,
+        createdById: member2.id,
+        assignedToId: leader.id,
+        completionTime: 45,
+        peerScore: 9.2,
+        aiScore: 8.7,
+      },
+    ],
   });
 
   // --- FEEDBACK ---
   await prisma.feedback.createMany({
     data: [
       {
-        fromUserId: leader.id,
-        toUserId: member1.id,
+        fromMemberId: leaderMember.id,
+        toMemberId: member1Member.id,
         projectId: project.id,
         rating: 5,
         comment: "Excellent backend structure and code clarity.",
       },
       {
-        fromUserId: member1.id,
-        toUserId: member2.id,
+        fromMemberId: member1Member.id,
+        toMemberId: member2Member.id,
         projectId: project.id,
         rating: 4,
         comment: "Good UI implementation, needs polish on responsiveness.",
       },
       {
-        fromUserId: member2.id,
-        toUserId: leader.id,
+        fromMemberId: member2Member.id,
+        toMemberId: leaderMember.id,
         projectId: project.id,
         rating: 5,
         comment: "Great coordination and leadership throughout the sprint.",
@@ -123,11 +129,13 @@ async function main() {
     data: [
       {
         projectId: project.id,
-        content: "Team efficiency improved by 20% after integrating async review sessions.",
+        content:
+          "Team efficiency improved by 20% after integrating async review sessions.",
       },
       {
         projectId: project.id,
-        content: "Frontend load times decreased by 30% after optimizing React components.",
+        content:
+          "Frontend load times decreased by 30% after optimizing React components.",
       },
     ],
   });
@@ -137,17 +145,17 @@ async function main() {
     data: [
       {
         content: "Hey team, remember to push your commits before 5 PM.",
-        senderId: leader.id,
+        senderId: leaderMember.id,
         projectId: project.id,
       },
       {
         content: "Frontend PR is ready for review.",
-        senderId: member1.id,
+        senderId: member1Member.id,
         projectId: project.id,
       },
       {
         content: "Noted! I'll check and merge after testing.",
-        senderId: leader.id,
+        senderId: leaderMember.id,
         projectId: project.id,
       },
     ],
@@ -176,13 +184,9 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seeding error:", e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-
-
-  
