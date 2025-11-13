@@ -23,6 +23,7 @@ export async function middleware(req: NextRequest) {
       await verifyAccess(access); // still valid
       return NextResponse.next();
     } catch (e) {
+      console.log("Error verifying access token:", e);
       console.log("❌ Access token invalid or expired");
     }
   }
@@ -63,5 +64,6 @@ export const config = {
     "/api/protected/:path*",
     "/api/auth/sessions/:path*",
     "/dashboard/:path*",
+    "/api/projects/:path*",
   ],
 };

@@ -1,79 +1,53 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { projectSchema } from "@/lib/validators/validateProjectInput";
+import { parseRepoUrl } from "@/lib/github/parseRepoUrl";
+import { checkRepoAccess } from "@/lib/github/checkRepoAccess";
+import { checkScopes } from "@/lib/github/checkScopes";
+import { createProject, isRepoLinked } from "@/lib/db/projectService";
+import { inviteExistingUsers } from "@/lib/db/memberService";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
+import { withAuth } from "@/lib/withAuth";
+import { getGitHubToken } from "@/lib/github/getGitHubToken";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (req, user) => {
   try {
-    const body = await request.json();
-    const { name, description, createdById } = body;
+    const session = await getGitHubToken(user.id);
+    if (!session?.accessToken)
+      return sendError(
+        "Unauthorized — missing GitHub token",
+        "UNAUTHORIZED",
+        401
+      );
 
-    const userExists = await prisma.user.findUnique({
-      where: { id: createdById },
-    });
+    const body = await req.json();
+    const { name, description, githubRepo, members } =
+      projectSchema.parse(body);
 
-    if (!userExists) {
-      return sendError("User not found. Cannot create project.", "USER_NOT_FOUND", 400);
+    // 1. Validate and extract owner/repo
+    const { owner, repo } = parseRepoUrl(githubRepo);
+
+    // 2. Check scopes
+    checkScopes(session.scopes);
+
+    // 3. Verify write access
+    await checkRepoAccess(session.accessToken, owner, repo);
+
+    // 4. Prevent duplicate use
+    const exists = await isRepoLinked(githubRepo);
+    if (exists) {
+      return sendError("This repository is already linked to another project.");
     }
 
-    const result = await prisma.$transaction(async (tx) => {
-      const project = await tx.project.create({
-        data: {
-          name,
-          description,
-          createdById,
-        },
-      });
+    // 5. Create project
+    const project = await createProject(user.id, name, description, githubRepo);
 
-      await tx.projectMember.create({
-        data: {
-          userId: createdById,
-          projectId: project.id,
-          role: "LEADER",
-        },
-      });
+    // 6. Add members
+    if (members && members?.length > 0) {
+      await inviteExistingUsers(project.id, members);
+    }
 
-      await tx.message.create({
-        data: {
-          content: `Project "${name}" created successfully!`,
-          senderId: createdById,
-          projectId: project.id,
-        },
-      });
-
-      return project;
-    });
-
-    return sendSuccess(result, "Project created successfully");
-  } catch (error: any) {
-    console.error("Transaction failed. Rolling back...", error);
-    return sendError(error.message, "CREATE_PROJECT_ERROR", 500, error);
+    return sendSuccess(project, "Project created successfully", 201);
+  } catch (err) {
+    return handleRouteError(err);
   }
-}
-
-export async function GET() {
-  try {
-    const projects = await prisma.project.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-    });
-
-    return sendSuccess(projects, "Projects fetched successfully");
-  } catch (error: any) {
-    console.error("Error fetching projects:", error);
-    return sendError(error.message, "FETCH_PROJECTS_ERROR", 500, error);
-  }
-}
+});

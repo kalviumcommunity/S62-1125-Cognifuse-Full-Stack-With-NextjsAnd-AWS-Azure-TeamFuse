@@ -1,52 +1,134 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "../../../../lib/prisma";
-import { sendSuccess, sendError } from "@/lib/responseHandler";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/withAuth";
+import { AppError } from "@/lib/errors/AppError";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
-
+export const GET = withAuth(async (req, user) => {
   try {
+    const projectId = req.url.split("/").pop();
+    if (!projectId) {
+      throw new AppError("Missing project ID", "BAD_REQUEST", 400);
+    }
+
+    // Check if user is a member of the project
+    const membership = await prisma.projectMember.findFirst({
+      where: { projectId, userId: user.id, status: "ACCEPTED" },
+    });
+
+    if (!membership) {
+      throw new AppError(
+        "You are not a member of this project",
+        "FORBIDDEN",
+        403
+      );
+    }
+
+    // Fetch full project dashboard data
     const project = await prisma.project.findUnique({
-      where: { id },
+      where: { id: projectId },
       include: {
-        createdBy: true,
-        members: { include: { user: true } },
-        tasks: true,
-        messages: true,
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            assigneeId: true,
+            priority: true,
+          },
+        },
+
+        chatMessages: {
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          include: {
+            sender: {
+              select: { id: true, name: true, avatarUrl: true },
+            },
+          },
+        },
+
+        githubData: {
+          orderBy: { weekStart: "desc" },
+          take: 1,
+        },
+
+        insights: {
+          orderBy: { generatedAt: "desc" },
+          take: 1,
+        },
       },
     });
 
-    if (!project) return sendError("Project not found", "NOT_FOUND", 404);
+    if (!project) {
+      throw new AppError("Project not found", "NOT_FOUND", 404);
+    }
 
-    return sendSuccess(project, "Project fetched successfully");
-  } catch (error: any) {
-    return sendError(error.message, "FETCH_ERROR", 500, error);
-  }
-}
+    // ---- Transform data for frontend ---- //
+    const taskSummary = {
+      total: project.tasks.length,
+      todo: project.tasks.filter((t) => t.status === "PENDING").length,
+      inProgress: project.tasks.filter((t) => t.status === "IN_PROGRESS")
+        .length,
+      completed: project.tasks.filter((t) => t.status === "COMPLETED").length,
+      assignedToMe: project.tasks.filter((t) => t.assigneeId === user.id)
+        .length,
+    };
 
-export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+    const githubSummary = project.githubData[0] ?? {
+      commitCount: 0,
+      prCount: 0,
+      linesAdded: 0,
+      linesDeleted: 0,
+    };
 
-  try {
-    const data = await request.json();
-    const updated = await prisma.project.update({
-      where: { id },
-      data,
+    const latestInsight = project.insights[0] ?? null;
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        project: {
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          githubRepo: project.githubRepo,
+          createdAt: project.createdAt,
+          lastActive: project.lastActive,
+        },
+
+        members: project.members.map((m) => ({
+          memberId: m.id,
+          userId: m.user.id,
+          name: m.user.name,
+          email: m.user.email,
+          avatarUrl: m.user.avatarUrl,
+          role: m.role,
+          status: m.status,
+        })),
+
+        taskSummary,
+
+        recentMessages: project.chatMessages.reverse(), // oldest first
+
+        githubSummary,
+
+        latestInsight,
+      },
     });
-
-    return sendSuccess(updated, "Project updated successfully");
-  } catch (error: any) {
-    return sendError(error.message, "UPDATE_ERROR", 500, error);
+  } catch (err) {
+    return handleRouteError(err);
   }
-}
-
-export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
-
-  try {
-    await prisma.project.delete({ where: { id } });
-    return sendSuccess(null, "Project deleted successfully");
-  } catch (error: any) {
-    return sendError(error.message, "DELETE_ERROR", 500, error);
-  }
-}
+});

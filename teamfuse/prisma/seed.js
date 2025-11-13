@@ -41,25 +41,17 @@ async function main() {
       name: "Global Collaboration Platform",
       description:
         "A platform to manage remote engineering teams, feedback cycles, and project analytics.",
+      githubRepo: "https:github.com/someone/repo",
       createdById: leader.id,
       members: {
         create: [
-          { userId: leader.id, role: "LEADER" },
-          { userId: member1.id, role: "MEMBER" },
-          { userId: member2.id, role: "MEMBER" },
+          { userId: leader.id, role: "LEADER", status: "ACCEPTED" },
+          { userId: member1.id, role: "MEMBER", status: "ACCEPTED" },
+          { userId: member2.id, role: "MEMBER", status: "ACCEPTED" },
         ],
       },
     },
   });
-
-  // --- PROJECT MEMBERS FETCH ---
-  const projectMembers = await prisma.projectMember.findMany({
-    where: { projectId: project.id },
-  });
-
-  const leaderMember = projectMembers.find((m) => m.userId === leader.id);
-  const member1Member = projectMembers.find((m) => m.userId === member1.id);
-  const member2Member = projectMembers.find((m) => m.userId === member2.id);
 
   // --- TASKS ---
   await prisma.task.createMany({
@@ -70,8 +62,7 @@ async function main() {
         weight: 2.5,
         status: "IN_PROGRESS",
         projectId: project.id,
-        createdById: leader.id,
-        assignedToId: member1.id,
+        assigneeId: member1.id,
       },
       {
         title: "Design Project Dashboard",
@@ -79,8 +70,7 @@ async function main() {
         weight: 1.8,
         status: "PENDING",
         projectId: project.id,
-        createdById: member1.id,
-        assignedToId: member2.id,
+        assigneeId: member2.id,
       },
       {
         title: "Integrate Feedback API",
@@ -88,11 +78,7 @@ async function main() {
         weight: 2.0,
         status: "COMPLETED",
         projectId: project.id,
-        createdById: member2.id,
-        assignedToId: leader.id,
-        completionTime: 45,
-        peerScore: 9.2,
-        aiScore: 8.7,
+        assigneeId: leader.id,
       },
     ],
   });
@@ -101,24 +87,30 @@ async function main() {
   await prisma.feedback.createMany({
     data: [
       {
-        fromMemberId: leaderMember.id,
-        toMemberId: member1Member.id,
+        fromUserId: leader.id,
+        toUserId: member1.id,
         projectId: project.id,
-        rating: 5,
+        effort: 5,
+        collaboration: 5,
+        reliability: 5,
         comment: "Excellent backend structure and code clarity.",
       },
       {
-        fromMemberId: member1Member.id,
-        toMemberId: member2Member.id,
+        fromUserId: member1.id,
+        toUserId: member2.id,
         projectId: project.id,
-        rating: 4,
+        effort: 4,
+        collaboration: 4,
+        reliability: 4,
         comment: "Good UI implementation, needs polish on responsiveness.",
       },
       {
-        fromMemberId: member2Member.id,
-        toMemberId: leaderMember.id,
+        fromUserId: member2.id,
+        toUserId: leader.id,
         projectId: project.id,
-        rating: 5,
+        effort: 5,
+        collaboration: 5,
+        reliability: 5,
         comment: "Great coordination and leadership throughout the sprint.",
       },
     ],
@@ -129,57 +121,85 @@ async function main() {
     data: [
       {
         projectId: project.id,
-        content:
+        type: "weekly",
+        summary:
           "Team efficiency improved by 20% after integrating async review sessions.",
+        metrics: { improvement: "20%", focus: "review sessions" },
       },
       {
         projectId: project.id,
-        content:
+        type: "github",
+        summary:
           "Frontend load times decreased by 30% after optimizing React components.",
+        metrics: { improvement: "30%", focus: "React optimization" },
       },
     ],
   });
 
   // --- MESSAGES ---
-  await prisma.message.createMany({
+  await prisma.chatMessage.createMany({
     data: [
       {
-        content: "Hey team, remember to push your commits before 5 PM.",
-        senderId: leaderMember.id,
+        message: "Hey team, remember to push your commits before 5 PM.",
+        senderId: leader.id,
         projectId: project.id,
       },
       {
-        content: "Frontend PR is ready for review.",
-        senderId: member1Member.id,
+        message: "Frontend PR is ready for review.",
+        senderId: member1.id,
         projectId: project.id,
       },
       {
-        content: "Noted! I'll check and merge after testing.",
-        senderId: leaderMember.id,
+        message: "Noted! I'll check and merge after testing.",
+        senderId: leader.id,
         projectId: project.id,
       },
     ],
   });
 
-  // --- GITHUB DATA ---
-  await prisma.gitHubData.createMany({
+  // --- GITHUB ACTIVITY ---
+  await prisma.gitHubActivity.createMany({
     data: [
-      { userId: leader.id, commits: 85, pullRequests: 9, linesOfCode: 12000 },
-      { userId: member1.id, commits: 64, pullRequests: 7, linesOfCode: 9500 },
-      { userId: member2.id, commits: 51, pullRequests: 6, linesOfCode: 7200 },
+      {
+        userId: leader.id,
+        projectId: project.id,
+        commitCount: 85,
+        prCount: 9,
+        linesAdded: 12000,
+        linesDeleted: 500,
+        weekStart: new Date(),
+      },
+      {
+        userId: member1.id,
+        projectId: project.id,
+        commitCount: 64,
+        prCount: 7,
+        linesAdded: 9500,
+        linesDeleted: 300,
+        weekStart: new Date(),
+      },
+      {
+        userId: member2.id,
+        projectId: project.id,
+        commitCount: 51,
+        prCount: 6,
+        linesAdded: 7200,
+        linesDeleted: 200,
+        weekStart: new Date(),
+      },
     ],
   });
 
   // --- GOOGLE DOCS DATA ---
   await prisma.googleDocsData.createMany({
     data: [
-      { userId: leader.id, editsCount: 320 },
-      { userId: member1.id, editsCount: 290 },
-      { userId: member2.id, editsCount: 180 },
+      { userId: leader.id, editsCount: 320, lastActivity: new Date() },
+      { userId: member1.id, editsCount: 290, lastActivity: new Date() },
+      { userId: member2.id, editsCount: 180, lastActivity: new Date() },
     ],
   });
 
-  console.log("✅ Database seeded successfully with foreign test data!");
+  console.log("✅ Database seeded successfully with test data!");
 }
 
 main()

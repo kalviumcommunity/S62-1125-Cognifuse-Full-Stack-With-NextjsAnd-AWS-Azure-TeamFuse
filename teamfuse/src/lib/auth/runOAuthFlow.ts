@@ -8,6 +8,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { type NextRequest } from "next/server";
 import { cookies } from "next/headers";
+import { encrypt } from "../crypto/encryption";
 
 export async function runOAuthFlow(
   payload: {
@@ -16,6 +17,8 @@ export async function runOAuthFlow(
     avatar?: string;
     oauthProvider: "github" | "google";
     oauthId: string;
+    githubAccessToken?: string;
+    githubScopes?: string;
     deviceName?: string | undefined;
   },
   req: NextRequest | null = null // only for API route, not needed in callback
@@ -44,7 +47,33 @@ export async function runOAuthFlow(
     create: { email, name, avatarUrl: avatar, oauthProvider, oauthId },
   });
 
-  const jwtUser: JwtUser = { sub: user.id, email: user.email };
+  if (payload.githubAccessToken) {
+    await prisma.userOAuth.upsert({
+      where: {
+        provider_providerUserId: {
+          provider: "github",
+          providerUserId: oauthId,
+        },
+      },
+      update: {
+        accessTokenEnc: encrypt(payload.githubAccessToken),
+        scopes: payload.githubScopes ?? null,
+        tokenExpiresAt: null, // GitHub doesn't give expiry
+      },
+      create: {
+        userId: user.id,
+        provider: "github",
+        providerUserId: oauthId,
+        accessTokenEnc: encrypt(payload.githubAccessToken),
+        scopes: payload.githubScopes ?? null,
+      },
+    });
+  }
+
+  const jwtUser: JwtUser = {
+    sub: user.id,
+    email: user.email,
+  };
 
   // ✅ remove expired refresh tokens
   await prisma.refreshToken.deleteMany({

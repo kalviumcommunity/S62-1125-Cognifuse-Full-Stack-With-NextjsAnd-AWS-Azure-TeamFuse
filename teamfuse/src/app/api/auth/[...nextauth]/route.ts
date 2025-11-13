@@ -7,6 +7,11 @@ const handler = NextAuth({
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "repo read:org read:user user:email",
+        },
+      },
     }),
   ],
   callbacks: {
@@ -22,6 +27,9 @@ const handler = NextAuth({
         avatar: user.image!,
         oauthProvider: "github",
         oauthId: account.providerAccountId,
+
+        githubAccessToken: account.access_token!,
+        githubScopes: account.scope!,
       });
 
       return true;

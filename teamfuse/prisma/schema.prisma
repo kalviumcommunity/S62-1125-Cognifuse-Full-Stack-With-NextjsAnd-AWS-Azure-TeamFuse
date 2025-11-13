@@ -10,25 +10,46 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(uuid())
-  name             String
-  email            String          @unique
-  role             Role            @default(MEMBER)
-  avatarUrl        String?
-  oauthProvider    String          @default("github")
-  oauthId          String          @unique
-  createdAt        DateTime        @default(now())
-  feedbackGiven    Feedback[]      @relation("FeedbackGiven")
-  feedbackReceived Feedback[]      @relation("FeedbackReceived")
-  githubProfile    GitHubData?
-  googleProfile    GoogleDocsData?
-  messages         Message[]
-  projectsCreated  Project[]       @relation("ProjectsCreated")
-  projects         ProjectMember[]
-  refreshTokens    RefreshToken[]
-  tasksAssigned    Task[]          @relation("AssignedTasks")
-  tasksCreated     Task[]          @relation("CreatedTasks")
-  presenceSessions PresenceSession[]
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  avatarUrl     String?
+  oauthProvider String   @default("github")
+  oauthId       String   @unique
+  createdAt     DateTime @default(now())
+
+  oauthAccounts UserOAuth[] // 1-to-many, no onDelete here
+
+  projectsCreated Project[]       @relation("ProjectsCreated")
+  googleDocsData  GoogleDocsData?
+
+  memberships      ProjectMember[]
+  messages         ChatMessage[]
+  tasks            Task[]
+  feedbackGiven    Feedback[]       @relation("FeedbackGiven")
+  feedbackReceived Feedback[]       @relation("FeedbackReceived")
+  githubActivities GitHubActivity[]
+  presenceLogs     PresenceLog[]
+
+  refreshTokens RefreshToken[]
+}
+
+model UserOAuth {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider       String
+  providerUserId String
+  accessTokenEnc String
+  tokenExpiresAt DateTime?
+  scopes         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
 }
 
 model RefreshToken {
@@ -51,72 +72,86 @@ model RefreshToken {
 }
 
 model Project {
-  id          String          @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
+  githubRepo  String
   createdById String
-  createdAt   DateTime        @default(now())
-  feedbacks   Feedback[]
-  insights    Insight[]
-  messages    Message[]
-  createdBy   User            @relation("ProjectsCreated", fields: [createdById], references: [id])
-  members     ProjectMember[]
-  tasks       Task[]
-  presenceSessions PresenceSession[]
+  createdAt   DateTime  @default(now())
+  lastActive  DateTime?
+
+  members      ProjectMember[]
+  tasks        Task[]
+  chatMessages ChatMessage[]
+  feedbacks    Feedback[]
+  githubData   GitHubActivity[]
+  insights     Insight[]
+  presenceLogs PresenceLog[]
+  createdBy    User             @relation("ProjectsCreated", fields: [createdById], references: [id])
 
   @@index([createdById])
   @@index([createdAt])
 }
 
 model ProjectMember {
-  id        String   @id @default(uuid())
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
   userId    String
+  project   Project @relation(fields: [projectId], references: [id])
   projectId String
-  role      Role     @default(MEMBER)
-  joinedAt  DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
 
+  role     ProjectRole  @default(MEMBER) // 'leader' | 'member'
+  status   MemberStatus @default(PENDING) // 'pending' | 'accepted' | 'declined'
+  joinedAt DateTime?    @default(now())
+
+  @@unique([userId, projectId]) // A user can't join the same project twice
   @@index([projectId])
   @@index([userId])
 }
 
 model Task {
-  id             String     @id @default(uuid())
-  title          String
-  description    String?
-  weight         Float      @default(1.0)
-  status         TaskStatus @default(PENDING)
-  projectId      String
-  createdById    String
-  assignedToId   String?
-  completionTime Int?
-  peerScore      Float?
-  aiScore        Float?
-  createdAt      DateTime   @default(now())
-  assignedTo     User?      @relation("AssignedTasks", fields: [assignedToId], references: [id])
-  createdBy      User       @relation("CreatedTasks", fields: [createdById], references: [id])
-  project        Project    @relation(fields: [projectId], references: [id])
+  id          String       @id @default(cuid())
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  priority    TaskPriority @default(MEDIUM) // 'low' | 'medium' | 'high'
+  projectId   String
+  title       String
+  description String?
+  weight      Float        @default(1.0)
+  status      TaskStatus   @default(PENDING) // 'todo' | 'in-progress' | 'done'
+  assignee    User?        @relation(fields: [assigneeId], references: [id])
+  assigneeId  String?
+  createdAt   DateTime     @default(now())
+  completedAt DateTime?
+  score       Float?
 }
 
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  senderId  String
-  projectId String
-  createdAt DateTime @default(now())
+model ChatMessage {
+  id        String   @id @default(cuid())
   project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
   sender    User     @relation(fields: [senderId], references: [id])
+  senderId  String
+  message   String
+  type      String   @default("text") // 'text' | 'code' | 'image'
+  aiLabel   String? // 'helpful' | 'off-topic' | etc.
+  createdAt DateTime @default(now())
 }
 
-model GitHubData {
-  id           String    @id @default(uuid())
-  userId       String    @unique
-  commits      Int?      @default(0)
-  pullRequests Int?      @default(0)
-  linesOfCode  Int?      @default(0)
-  lastSync     DateTime?
-  user         User      @relation(fields: [userId], references: [id])
+model GitHubActivity {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+
+  commitCount   Int      @default(0)
+  prCount       Int      @default(0)
+  linesAdded    Int      @default(0)
+  linesDeleted  Int      @default(0)
+  weekStart     DateTime
+  commitDetails Json? // store structured AI-labeled commit summaries
+
+  @@unique([projectId, userId, weekStart])
 }
 
 model GoogleDocsData {
@@ -128,42 +163,44 @@ model GoogleDocsData {
 }
 
 model Insight {
-  id        String   @id @default(uuid())
-  projectId String
-  content   String
-  createdAt DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id])
+  id          String   @id @default(cuid())
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String
+  generatedAt DateTime @default(now())
+  type        String // 'weekly' | 'github' | 'chat' | 'tasks'
+  summary     String
+  metrics     Json?
 }
 
 model Feedback {
-  id         String   @id @default(uuid())
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  fromUser   User   @relation("FeedbackGiven", fields: [fromUserId], references: [id])
   fromUserId String
+  toUser     User   @relation("FeedbackReceived", fields: [toUserId], references: [id])
   toUserId   String
-  projectId  String
-  rating     Int
-  comment    String?
-  createdAt  DateTime @default(now())
-  fromUser   User     @relation("FeedbackGiven", fields: [fromUserId], references: [id])
-  project    Project  @relation(fields: [projectId], references: [id])
-  toUser     User     @relation("FeedbackReceived", fields: [toUserId], references: [id])
+
+  effort        Int
+  collaboration Int
+  reliability   Int
+  comment       String?
+  aiFlag        String? // 'biased', 'neutral', etc.
+  createdAt     DateTime @default(now())
 }
 
+model PresenceLog {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
 
-model PresenceSession {
-  id                String          @id @default(uuid())
-  userId            String
-  projectId         String
-  status            PresenceStatus  @default(OFFLINE)
-  startedAt         DateTime        @default(now())
-  endedAt           DateTime?
-  lastActive        DateTime        @default(now())
-  totalActiveMinutes Int?           @default(0)
-
-  user    User    @relation(fields: [userId], references: [id])
-  project Project @relation(fields: [projectId], references: [id])
-
-  @@index([userId])
-  @@index([projectId])
+  status       PresenceStatus @default(OFFLINE) // 'online' | 'idle' | 'working' | 'offline'
+  sessionStart DateTime
+  sessionEnd   DateTime?
+  duration     Int? // minutes
 }
 
 enum PresenceStatus {
@@ -173,7 +210,7 @@ enum PresenceStatus {
   FOCUSED
 }
 
-enum Role {
+enum ProjectRole {
   LEADER
   MEMBER
 }
@@ -182,4 +219,16 @@ enum TaskStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MemberStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

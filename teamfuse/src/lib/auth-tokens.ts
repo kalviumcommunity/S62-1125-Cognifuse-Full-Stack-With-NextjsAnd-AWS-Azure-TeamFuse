@@ -4,10 +4,15 @@ import { SignJWT, jwtVerify } from "jose";
 const accessSecret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET!);
 const refreshSecret = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET!);
 
-export type JwtUser = { sub: string; email: string };
+export type JwtUser = {
+  sub: string;
+  email: string;
+};
 
 export async function signAccessToken(user: JwtUser) {
-  return await new SignJWT({ email: user.email })
+  return await new SignJWT({
+    email: user.email,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(user.sub)
     .setIssuedAt()
