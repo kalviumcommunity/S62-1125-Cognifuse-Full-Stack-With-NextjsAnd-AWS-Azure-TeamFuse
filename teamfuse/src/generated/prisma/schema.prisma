@@ -105,18 +105,20 @@ model ProjectMember {
 
 model Task {
   id          String       @id @default(cuid())
-  priority    TaskPriority @default(MEDIUM)
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
   title       String
   description String?
-  weight      Float        @default(1.0)
-  status      TaskStatus   @default(PENDING)
+  weight      Int          @default(1)
+  status      TaskStatus   @default(TODO)
+  progress    Int          @default(0)
+  assignee    User?        @relation(fields: [assigneeId], references: [id])
   assigneeId  String?
   createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   completedAt DateTime?
   score       Float?
-  assignee    User?        @relation(fields: [assigneeId], references: [id])
-  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  priority    TaskPriority @default(MEDIUM)
 }
 
 model ChatMessage {
@@ -212,9 +214,10 @@ enum ProjectRole {
 }
 
 enum TaskStatus {
-  PENDING
+  TODO
   IN_PROGRESS
-  COMPLETED
+  REVIEW
+  DONE
 }
 
 enum TaskPriority {

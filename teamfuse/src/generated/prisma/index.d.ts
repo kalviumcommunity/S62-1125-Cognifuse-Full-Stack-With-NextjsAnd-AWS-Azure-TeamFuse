@@ -98,9 +98,10 @@ export namespace $Enums {
   export type ProjectRole = (typeof ProjectRole)[keyof typeof ProjectRole];
 
   export const TaskStatus: {
-    PENDING: "PENDING";
+    TODO: "TODO";
     IN_PROGRESS: "IN_PROGRESS";
-    COMPLETED: "COMPLETED";
+    REVIEW: "REVIEW";
+    DONE: "DONE";
   };
 
   export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
@@ -489,8 +490,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact;
 
   /**
-   * Prisma Client JS version: 6.18.0
-   * Query Engine version: 34b5a692b7bd79939a9a2c3ef97d816e749cda2f
+   * Prisma Client JS version: 6.19.0
+   * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
    */
   export type PrismaVersion = {
     client: string;
@@ -9864,107 +9865,123 @@ export namespace Prisma {
 
   export type TaskAvgAggregateOutputType = {
     weight: number | null;
+    progress: number | null;
     score: number | null;
   };
 
   export type TaskSumAggregateOutputType = {
     weight: number | null;
+    progress: number | null;
     score: number | null;
   };
 
   export type TaskMinAggregateOutputType = {
     id: string | null;
-    priority: $Enums.TaskPriority | null;
     projectId: string | null;
     title: string | null;
     description: string | null;
     weight: number | null;
     status: $Enums.TaskStatus | null;
+    progress: number | null;
     assigneeId: string | null;
     createdAt: Date | null;
+    updatedAt: Date | null;
     completedAt: Date | null;
     score: number | null;
+    priority: $Enums.TaskPriority | null;
   };
 
   export type TaskMaxAggregateOutputType = {
     id: string | null;
-    priority: $Enums.TaskPriority | null;
     projectId: string | null;
     title: string | null;
     description: string | null;
     weight: number | null;
     status: $Enums.TaskStatus | null;
+    progress: number | null;
     assigneeId: string | null;
     createdAt: Date | null;
+    updatedAt: Date | null;
     completedAt: Date | null;
     score: number | null;
+    priority: $Enums.TaskPriority | null;
   };
 
   export type TaskCountAggregateOutputType = {
     id: number;
-    priority: number;
     projectId: number;
     title: number;
     description: number;
     weight: number;
     status: number;
+    progress: number;
     assigneeId: number;
     createdAt: number;
+    updatedAt: number;
     completedAt: number;
     score: number;
+    priority: number;
     _all: number;
   };
 
   export type TaskAvgAggregateInputType = {
     weight?: true;
+    progress?: true;
     score?: true;
   };
 
   export type TaskSumAggregateInputType = {
     weight?: true;
+    progress?: true;
     score?: true;
   };
 
   export type TaskMinAggregateInputType = {
     id?: true;
-    priority?: true;
     projectId?: true;
     title?: true;
     description?: true;
     weight?: true;
     status?: true;
+    progress?: true;
     assigneeId?: true;
     createdAt?: true;
+    updatedAt?: true;
     completedAt?: true;
     score?: true;
+    priority?: true;
   };
 
   export type TaskMaxAggregateInputType = {
     id?: true;
-    priority?: true;
     projectId?: true;
     title?: true;
     description?: true;
     weight?: true;
     status?: true;
+    progress?: true;
     assigneeId?: true;
     createdAt?: true;
+    updatedAt?: true;
     completedAt?: true;
     score?: true;
+    priority?: true;
   };
 
   export type TaskCountAggregateInputType = {
     id?: true;
-    priority?: true;
     projectId?: true;
     title?: true;
     description?: true;
     weight?: true;
     status?: true;
+    progress?: true;
     assigneeId?: true;
     createdAt?: true;
+    updatedAt?: true;
     completedAt?: true;
     score?: true;
+    priority?: true;
     _all?: true;
   };
 
@@ -10059,16 +10076,18 @@ export namespace Prisma {
 
   export type TaskGroupByOutputType = {
     id: string;
-    priority: $Enums.TaskPriority;
     projectId: string;
     title: string;
     description: string | null;
     weight: number;
     status: $Enums.TaskStatus;
+    progress: number;
     assigneeId: string | null;
     createdAt: Date;
+    updatedAt: Date;
     completedAt: Date | null;
     score: number | null;
+    priority: $Enums.TaskPriority;
     _count: TaskCountAggregateOutputType | null;
     _avg: TaskAvgAggregateOutputType | null;
     _sum: TaskSumAggregateOutputType | null;
@@ -10093,18 +10112,20 @@ export namespace Prisma {
   > = $Extensions.GetSelect<
     {
       id?: boolean;
-      priority?: boolean;
       projectId?: boolean;
       title?: boolean;
       description?: boolean;
       weight?: boolean;
       status?: boolean;
+      progress?: boolean;
       assigneeId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       completedAt?: boolean;
       score?: boolean;
-      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
+      priority?: boolean;
       project?: boolean | ProjectDefaultArgs<ExtArgs>;
+      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     },
     ExtArgs["result"]["task"]
   >;
@@ -10114,18 +10135,20 @@ export namespace Prisma {
   > = $Extensions.GetSelect<
     {
       id?: boolean;
-      priority?: boolean;
       projectId?: boolean;
       title?: boolean;
       description?: boolean;
       weight?: boolean;
       status?: boolean;
+      progress?: boolean;
       assigneeId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       completedAt?: boolean;
       score?: boolean;
-      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
+      priority?: boolean;
       project?: boolean | ProjectDefaultArgs<ExtArgs>;
+      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     },
     ExtArgs["result"]["task"]
   >;
@@ -10135,69 +10158,75 @@ export namespace Prisma {
   > = $Extensions.GetSelect<
     {
       id?: boolean;
-      priority?: boolean;
       projectId?: boolean;
       title?: boolean;
       description?: boolean;
       weight?: boolean;
       status?: boolean;
+      progress?: boolean;
       assigneeId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       completedAt?: boolean;
       score?: boolean;
-      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
+      priority?: boolean;
       project?: boolean | ProjectDefaultArgs<ExtArgs>;
+      assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     },
     ExtArgs["result"]["task"]
   >;
 
   export type TaskSelectScalar = {
     id?: boolean;
-    priority?: boolean;
     projectId?: boolean;
     title?: boolean;
     description?: boolean;
     weight?: boolean;
     status?: boolean;
+    progress?: boolean;
     assigneeId?: boolean;
     createdAt?: boolean;
+    updatedAt?: boolean;
     completedAt?: boolean;
     score?: boolean;
+    priority?: boolean;
   };
 
   export type TaskOmit<
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = $Extensions.GetOmit<
     | "id"
-    | "priority"
     | "projectId"
     | "title"
     | "description"
     | "weight"
     | "status"
+    | "progress"
     | "assigneeId"
     | "createdAt"
+    | "updatedAt"
     | "completedAt"
-    | "score",
+    | "score"
+    | "priority",
     ExtArgs["result"]["task"]
   >;
   export type TaskInclude<
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
-    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     project?: boolean | ProjectDefaultArgs<ExtArgs>;
+    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
   };
   export type TaskIncludeCreateManyAndReturn<
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
-    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     project?: boolean | ProjectDefaultArgs<ExtArgs>;
+    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
   };
   export type TaskIncludeUpdateManyAndReturn<
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
-    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
     project?: boolean | ProjectDefaultArgs<ExtArgs>;
+    assignee?: boolean | Task$assigneeArgs<ExtArgs>;
   };
 
   export type $TaskPayload<
@@ -10205,22 +10234,24 @@ export namespace Prisma {
   > = {
     name: "Task";
     objects: {
-      assignee: Prisma.$UserPayload<ExtArgs> | null;
       project: Prisma.$ProjectPayload<ExtArgs>;
+      assignee: Prisma.$UserPayload<ExtArgs> | null;
     };
     scalars: $Extensions.GetPayloadResult<
       {
         id: string;
-        priority: $Enums.TaskPriority;
         projectId: string;
         title: string;
         description: string | null;
         weight: number;
         status: $Enums.TaskStatus;
+        progress: number;
         assigneeId: string | null;
         createdAt: Date;
+        updatedAt: Date;
         completedAt: Date | null;
         score: number | null;
+        priority: $Enums.TaskPriority;
       },
       ExtArgs["result"]["task"]
     >;
@@ -10766,19 +10797,6 @@ export namespace Prisma {
     GlobalOmitOptions = {},
   > extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    assignee<T extends Task$assigneeArgs<ExtArgs> = {}>(
-      args?: Subset<T, Task$assigneeArgs<ExtArgs>>
-    ): Prisma__UserClient<
-      $Result.GetResult<
-        Prisma.$UserPayload<ExtArgs>,
-        T,
-        "findUniqueOrThrow",
-        GlobalOmitOptions
-      > | null,
-      null,
-      ExtArgs,
-      GlobalOmitOptions
-    >;
     project<T extends ProjectDefaultArgs<ExtArgs> = {}>(
       args?: Subset<T, ProjectDefaultArgs<ExtArgs>>
     ): Prisma__ProjectClient<
@@ -10790,6 +10808,19 @@ export namespace Prisma {
         >
       | Null,
       Null,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+    assignee<T extends Task$assigneeArgs<ExtArgs> = {}>(
+      args?: Subset<T, Task$assigneeArgs<ExtArgs>>
+    ): Prisma__UserClient<
+      $Result.GetResult<
+        Prisma.$UserPayload<ExtArgs>,
+        T,
+        "findUniqueOrThrow",
+        GlobalOmitOptions
+      > | null,
+      null,
       ExtArgs,
       GlobalOmitOptions
     >;
@@ -10834,16 +10865,18 @@ export namespace Prisma {
    */
   interface TaskFieldRefs {
     readonly id: FieldRef<"Task", "String">;
-    readonly priority: FieldRef<"Task", "TaskPriority">;
     readonly projectId: FieldRef<"Task", "String">;
     readonly title: FieldRef<"Task", "String">;
     readonly description: FieldRef<"Task", "String">;
-    readonly weight: FieldRef<"Task", "Float">;
+    readonly weight: FieldRef<"Task", "Int">;
     readonly status: FieldRef<"Task", "TaskStatus">;
+    readonly progress: FieldRef<"Task", "Int">;
     readonly assigneeId: FieldRef<"Task", "String">;
     readonly createdAt: FieldRef<"Task", "DateTime">;
+    readonly updatedAt: FieldRef<"Task", "DateTime">;
     readonly completedAt: FieldRef<"Task", "DateTime">;
     readonly score: FieldRef<"Task", "Float">;
+    readonly priority: FieldRef<"Task", "TaskPriority">;
   }
 
   // Custom InputTypes
@@ -19771,16 +19804,18 @@ export namespace Prisma {
 
   export const TaskScalarFieldEnum: {
     id: "id";
-    priority: "priority";
     projectId: "projectId";
     title: "title";
     description: "description";
     weight: "weight";
     status: "status";
+    progress: "progress";
     assigneeId: "assigneeId";
     createdAt: "createdAt";
+    updatedAt: "updatedAt";
     completedAt: "completedAt";
     score: "score";
+    priority: "priority";
   };
 
   export type TaskScalarFieldEnum =
@@ -19984,33 +20019,19 @@ export namespace Prisma {
     FieldRefInputType<$PrismaModel, "MemberStatus[]">;
 
   /**
-   * Reference to a field of type 'TaskPriority'
+   * Reference to a field of type 'Int'
    */
-  export type EnumTaskPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<
     $PrismaModel,
-    "TaskPriority"
+    "Int"
   >;
 
   /**
-   * Reference to a field of type 'TaskPriority[]'
+   * Reference to a field of type 'Int[]'
    */
-  export type ListEnumTaskPriorityFieldRefInput<$PrismaModel> =
-    FieldRefInputType<$PrismaModel, "TaskPriority[]">;
-
-  /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<
     $PrismaModel,
-    "Float"
-  >;
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<
-    $PrismaModel,
-    "Float[]"
+    "Int[]"
   >;
 
   /**
@@ -20030,20 +20051,34 @@ export namespace Prisma {
   >;
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'Float'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<
     $PrismaModel,
-    "Int"
+    "Float"
   >;
 
   /**
-   * Reference to a field of type 'Int[]'
+   * Reference to a field of type 'Float[]'
    */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<
     $PrismaModel,
-    "Int[]"
+    "Float[]"
   >;
+
+  /**
+   * Reference to a field of type 'TaskPriority'
+   */
+  export type EnumTaskPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<
+    $PrismaModel,
+    "TaskPriority"
+  >;
+
+  /**
+   * Reference to a field of type 'TaskPriority[]'
+   */
+  export type ListEnumTaskPriorityFieldRefInput<$PrismaModel> =
+    FieldRefInputType<$PrismaModel, "TaskPriority[]">;
 
   /**
    * Reference to a field of type 'Json'
@@ -20593,34 +20628,38 @@ export namespace Prisma {
     OR?: TaskWhereInput[];
     NOT?: TaskWhereInput | TaskWhereInput[];
     id?: StringFilter<"Task"> | string;
-    priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
     projectId?: StringFilter<"Task"> | string;
     title?: StringFilter<"Task"> | string;
     description?: StringNullableFilter<"Task"> | string | null;
-    weight?: FloatFilter<"Task"> | number;
+    weight?: IntFilter<"Task"> | number;
     status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus;
+    progress?: IntFilter<"Task"> | number;
     assigneeId?: StringNullableFilter<"Task"> | string | null;
     createdAt?: DateTimeFilter<"Task"> | Date | string;
+    updatedAt?: DateTimeFilter<"Task"> | Date | string;
     completedAt?: DateTimeNullableFilter<"Task"> | Date | string | null;
     score?: FloatNullableFilter<"Task"> | number | null;
-    assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null;
+    priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>;
+    assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null;
   };
 
   export type TaskOrderByWithRelationInput = {
     id?: SortOrder;
-    priority?: SortOrder;
     projectId?: SortOrder;
     title?: SortOrder;
     description?: SortOrderInput | SortOrder;
     weight?: SortOrder;
     status?: SortOrder;
+    progress?: SortOrder;
     assigneeId?: SortOrderInput | SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     completedAt?: SortOrderInput | SortOrder;
     score?: SortOrderInput | SortOrder;
-    assignee?: UserOrderByWithRelationInput;
+    priority?: SortOrder;
     project?: ProjectOrderByWithRelationInput;
+    assignee?: UserOrderByWithRelationInput;
   };
 
   export type TaskWhereUniqueInput = Prisma.AtLeast<
@@ -20629,34 +20668,38 @@ export namespace Prisma {
       AND?: TaskWhereInput | TaskWhereInput[];
       OR?: TaskWhereInput[];
       NOT?: TaskWhereInput | TaskWhereInput[];
-      priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
       projectId?: StringFilter<"Task"> | string;
       title?: StringFilter<"Task"> | string;
       description?: StringNullableFilter<"Task"> | string | null;
-      weight?: FloatFilter<"Task"> | number;
+      weight?: IntFilter<"Task"> | number;
       status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus;
+      progress?: IntFilter<"Task"> | number;
       assigneeId?: StringNullableFilter<"Task"> | string | null;
       createdAt?: DateTimeFilter<"Task"> | Date | string;
+      updatedAt?: DateTimeFilter<"Task"> | Date | string;
       completedAt?: DateTimeNullableFilter<"Task"> | Date | string | null;
       score?: FloatNullableFilter<"Task"> | number | null;
-      assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null;
+      priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
       project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>;
+      assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null;
     },
     "id"
   >;
 
   export type TaskOrderByWithAggregationInput = {
     id?: SortOrder;
-    priority?: SortOrder;
     projectId?: SortOrder;
     title?: SortOrder;
     description?: SortOrderInput | SortOrder;
     weight?: SortOrder;
     status?: SortOrder;
+    progress?: SortOrder;
     assigneeId?: SortOrderInput | SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     completedAt?: SortOrderInput | SortOrder;
     score?: SortOrderInput | SortOrder;
+    priority?: SortOrder;
     _count?: TaskCountOrderByAggregateInput;
     _avg?: TaskAvgOrderByAggregateInput;
     _max?: TaskMaxOrderByAggregateInput;
@@ -20673,22 +20716,24 @@ export namespace Prisma {
       | TaskScalarWhereWithAggregatesInput
       | TaskScalarWhereWithAggregatesInput[];
     id?: StringWithAggregatesFilter<"Task"> | string;
-    priority?:
-      | EnumTaskPriorityWithAggregatesFilter<"Task">
-      | $Enums.TaskPriority;
     projectId?: StringWithAggregatesFilter<"Task"> | string;
     title?: StringWithAggregatesFilter<"Task"> | string;
     description?: StringNullableWithAggregatesFilter<"Task"> | string | null;
-    weight?: FloatWithAggregatesFilter<"Task"> | number;
+    weight?: IntWithAggregatesFilter<"Task"> | number;
     status?: EnumTaskStatusWithAggregatesFilter<"Task"> | $Enums.TaskStatus;
+    progress?: IntWithAggregatesFilter<"Task"> | number;
     assigneeId?: StringNullableWithAggregatesFilter<"Task"> | string | null;
     createdAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string;
+    updatedAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string;
     completedAt?:
       | DateTimeNullableWithAggregatesFilter<"Task">
       | Date
       | string
       | null;
     score?: FloatNullableWithAggregatesFilter<"Task"> | number | null;
+    priority?:
+      | EnumTaskPriorityWithAggregatesFilter<"Task">
+      | $Enums.TaskPriority;
   };
 
   export type ChatMessageWhereInput = {
@@ -21725,114 +21770,128 @@ export namespace Prisma {
 
   export type TaskCreateInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
-    assignee?: UserCreateNestedOneWithoutTasksInput;
+    priority?: $Enums.TaskPriority;
     project: ProjectCreateNestedOneWithoutTasksInput;
+    assignee?: UserCreateNestedOneWithoutTasksInput;
   };
 
   export type TaskUncheckedCreateInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     projectId: string;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     assigneeId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type TaskUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
-    assignee?: UserUpdateOneWithoutTasksNestedInput;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     project?: ProjectUpdateOneRequiredWithoutTasksNestedInput;
+    assignee?: UserUpdateOneWithoutTasksNestedInput;
   };
 
   export type TaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     projectId?: StringFieldUpdateOperationsInput | string;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     assigneeId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type TaskCreateManyInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     projectId: string;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     assigneeId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type TaskUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type TaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     projectId?: StringFieldUpdateOperationsInput | string;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     assigneeId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type ChatMessageCreateInput = {
@@ -22809,26 +22868,15 @@ export namespace Prisma {
     _max?: NestedEnumMemberStatusFilter<$PrismaModel>;
   };
 
-  export type EnumTaskPriorityFilter<$PrismaModel = never> = {
-    equals?: $Enums.TaskPriority | EnumTaskPriorityFieldRefInput<$PrismaModel>;
-    in?:
-      | $Enums.TaskPriority[]
-      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-    notIn?:
-      | $Enums.TaskPriority[]
-      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-    not?: NestedEnumTaskPriorityFilter<$PrismaModel> | $Enums.TaskPriority;
-  };
-
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>;
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    lt?: number | FloatFieldRefInput<$PrismaModel>;
-    lte?: number | FloatFieldRefInput<$PrismaModel>;
-    gt?: number | FloatFieldRefInput<$PrismaModel>;
-    gte?: number | FloatFieldRefInput<$PrismaModel>;
-    not?: NestedFloatFilter<$PrismaModel> | number;
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>;
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    lt?: number | IntFieldRefInput<$PrismaModel>;
+    lte?: number | IntFieldRefInput<$PrismaModel>;
+    gt?: number | IntFieldRefInput<$PrismaModel>;
+    gte?: number | IntFieldRefInput<$PrismaModel>;
+    not?: NestedIntFilter<$PrismaModel> | number;
   };
 
   export type EnumTaskStatusFilter<$PrismaModel = never> = {
@@ -22849,64 +22897,7 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null;
   };
 
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null;
-    isNot?: UserWhereInput | null;
-  };
-
-  export type TaskCountOrderByAggregateInput = {
-    id?: SortOrder;
-    priority?: SortOrder;
-    projectId?: SortOrder;
-    title?: SortOrder;
-    description?: SortOrder;
-    weight?: SortOrder;
-    status?: SortOrder;
-    assigneeId?: SortOrder;
-    createdAt?: SortOrder;
-    completedAt?: SortOrder;
-    score?: SortOrder;
-  };
-
-  export type TaskAvgOrderByAggregateInput = {
-    weight?: SortOrder;
-    score?: SortOrder;
-  };
-
-  export type TaskMaxOrderByAggregateInput = {
-    id?: SortOrder;
-    priority?: SortOrder;
-    projectId?: SortOrder;
-    title?: SortOrder;
-    description?: SortOrder;
-    weight?: SortOrder;
-    status?: SortOrder;
-    assigneeId?: SortOrder;
-    createdAt?: SortOrder;
-    completedAt?: SortOrder;
-    score?: SortOrder;
-  };
-
-  export type TaskMinOrderByAggregateInput = {
-    id?: SortOrder;
-    priority?: SortOrder;
-    projectId?: SortOrder;
-    title?: SortOrder;
-    description?: SortOrder;
-    weight?: SortOrder;
-    status?: SortOrder;
-    assigneeId?: SortOrder;
-    createdAt?: SortOrder;
-    completedAt?: SortOrder;
-    score?: SortOrder;
-  };
-
-  export type TaskSumOrderByAggregateInput = {
-    weight?: SortOrder;
-    score?: SortOrder;
-  };
-
-  export type EnumTaskPriorityWithAggregatesFilter<$PrismaModel = never> = {
+  export type EnumTaskPriorityFilter<$PrismaModel = never> = {
     equals?: $Enums.TaskPriority | EnumTaskPriorityFieldRefInput<$PrismaModel>;
     in?:
       | $Enums.TaskPriority[]
@@ -22914,28 +22905,88 @@ export namespace Prisma {
     notIn?:
       | $Enums.TaskPriority[]
       | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-    not?:
-      | NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel>
-      | $Enums.TaskPriority;
-    _count?: NestedIntFilter<$PrismaModel>;
-    _min?: NestedEnumTaskPriorityFilter<$PrismaModel>;
-    _max?: NestedEnumTaskPriorityFilter<$PrismaModel>;
+    not?: NestedEnumTaskPriorityFilter<$PrismaModel> | $Enums.TaskPriority;
   };
 
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>;
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    lt?: number | FloatFieldRefInput<$PrismaModel>;
-    lte?: number | FloatFieldRefInput<$PrismaModel>;
-    gt?: number | FloatFieldRefInput<$PrismaModel>;
-    gte?: number | FloatFieldRefInput<$PrismaModel>;
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number;
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null;
+    isNot?: UserWhereInput | null;
+  };
+
+  export type TaskCountOrderByAggregateInput = {
+    id?: SortOrder;
+    projectId?: SortOrder;
+    title?: SortOrder;
+    description?: SortOrder;
+    weight?: SortOrder;
+    status?: SortOrder;
+    progress?: SortOrder;
+    assigneeId?: SortOrder;
+    createdAt?: SortOrder;
+    updatedAt?: SortOrder;
+    completedAt?: SortOrder;
+    score?: SortOrder;
+    priority?: SortOrder;
+  };
+
+  export type TaskAvgOrderByAggregateInput = {
+    weight?: SortOrder;
+    progress?: SortOrder;
+    score?: SortOrder;
+  };
+
+  export type TaskMaxOrderByAggregateInput = {
+    id?: SortOrder;
+    projectId?: SortOrder;
+    title?: SortOrder;
+    description?: SortOrder;
+    weight?: SortOrder;
+    status?: SortOrder;
+    progress?: SortOrder;
+    assigneeId?: SortOrder;
+    createdAt?: SortOrder;
+    updatedAt?: SortOrder;
+    completedAt?: SortOrder;
+    score?: SortOrder;
+    priority?: SortOrder;
+  };
+
+  export type TaskMinOrderByAggregateInput = {
+    id?: SortOrder;
+    projectId?: SortOrder;
+    title?: SortOrder;
+    description?: SortOrder;
+    weight?: SortOrder;
+    status?: SortOrder;
+    progress?: SortOrder;
+    assigneeId?: SortOrder;
+    createdAt?: SortOrder;
+    updatedAt?: SortOrder;
+    completedAt?: SortOrder;
+    score?: SortOrder;
+    priority?: SortOrder;
+  };
+
+  export type TaskSumOrderByAggregateInput = {
+    weight?: SortOrder;
+    progress?: SortOrder;
+    score?: SortOrder;
+  };
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>;
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    lt?: number | IntFieldRefInput<$PrismaModel>;
+    lte?: number | IntFieldRefInput<$PrismaModel>;
+    gt?: number | IntFieldRefInput<$PrismaModel>;
+    gte?: number | IntFieldRefInput<$PrismaModel>;
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number;
     _count?: NestedIntFilter<$PrismaModel>;
     _avg?: NestedFloatFilter<$PrismaModel>;
-    _sum?: NestedFloatFilter<$PrismaModel>;
-    _min?: NestedFloatFilter<$PrismaModel>;
-    _max?: NestedFloatFilter<$PrismaModel>;
+    _sum?: NestedIntFilter<$PrismaModel>;
+    _min?: NestedIntFilter<$PrismaModel>;
+    _max?: NestedIntFilter<$PrismaModel>;
   };
 
   export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -22964,6 +23015,22 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>;
     _min?: NestedFloatNullableFilter<$PrismaModel>;
     _max?: NestedFloatNullableFilter<$PrismaModel>;
+  };
+
+  export type EnumTaskPriorityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskPriority | EnumTaskPriorityFieldRefInput<$PrismaModel>;
+    in?:
+      | $Enums.TaskPriority[]
+      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+    notIn?:
+      | $Enums.TaskPriority[]
+      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+    not?:
+      | NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel>
+      | $Enums.TaskPriority;
+    _count?: NestedIntFilter<$PrismaModel>;
+    _min?: NestedEnumTaskPriorityFilter<$PrismaModel>;
+    _max?: NestedEnumTaskPriorityFilter<$PrismaModel>;
   };
 
   export type ChatMessageCountOrderByAggregateInput = {
@@ -22997,17 +23064,6 @@ export namespace Prisma {
     type?: SortOrder;
     aiLabel?: SortOrder;
     createdAt?: SortOrder;
-  };
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>;
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    lt?: number | IntFieldRefInput<$PrismaModel>;
-    lte?: number | IntFieldRefInput<$PrismaModel>;
-    gt?: number | IntFieldRefInput<$PrismaModel>;
-    gte?: number | IntFieldRefInput<$PrismaModel>;
-    not?: NestedIntFilter<$PrismaModel> | number;
   };
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -23096,22 +23152,6 @@ export namespace Prisma {
     prCount?: SortOrder;
     linesAdded?: SortOrder;
     linesDeleted?: SortOrder;
-  };
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>;
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    lt?: number | IntFieldRefInput<$PrismaModel>;
-    lte?: number | IntFieldRefInput<$PrismaModel>;
-    gt?: number | IntFieldRefInput<$PrismaModel>;
-    gte?: number | IntFieldRefInput<$PrismaModel>;
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number;
-    _count?: NestedIntFilter<$PrismaModel>;
-    _avg?: NestedFloatFilter<$PrismaModel>;
-    _sum?: NestedIntFilter<$PrismaModel>;
-    _min?: NestedIntFilter<$PrismaModel>;
-    _max?: NestedIntFilter<$PrismaModel>;
   };
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -25168,15 +25208,6 @@ export namespace Prisma {
     >;
   };
 
-  export type UserCreateNestedOneWithoutTasksInput = {
-    create?: XOR<
-      UserCreateWithoutTasksInput,
-      UserUncheckedCreateWithoutTasksInput
-    >;
-    connectOrCreate?: UserCreateOrConnectWithoutTasksInput;
-    connect?: UserWhereUniqueInput;
-  };
-
   export type ProjectCreateNestedOneWithoutTasksInput = {
     create?: XOR<
       ProjectCreateWithoutTasksInput,
@@ -25186,11 +25217,16 @@ export namespace Prisma {
     connect?: ProjectWhereUniqueInput;
   };
 
-  export type EnumTaskPriorityFieldUpdateOperationsInput = {
-    set?: $Enums.TaskPriority;
+  export type UserCreateNestedOneWithoutTasksInput = {
+    create?: XOR<
+      UserCreateWithoutTasksInput,
+      UserUncheckedCreateWithoutTasksInput
+    >;
+    connectOrCreate?: UserCreateOrConnectWithoutTasksInput;
+    connect?: UserWhereUniqueInput;
   };
 
-  export type FloatFieldUpdateOperationsInput = {
+  export type IntFieldUpdateOperationsInput = {
     set?: number;
     increment?: number;
     decrement?: number;
@@ -25210,23 +25246,8 @@ export namespace Prisma {
     divide?: number;
   };
 
-  export type UserUpdateOneWithoutTasksNestedInput = {
-    create?: XOR<
-      UserCreateWithoutTasksInput,
-      UserUncheckedCreateWithoutTasksInput
-    >;
-    connectOrCreate?: UserCreateOrConnectWithoutTasksInput;
-    upsert?: UserUpsertWithoutTasksInput;
-    disconnect?: UserWhereInput | boolean;
-    delete?: UserWhereInput | boolean;
-    connect?: UserWhereUniqueInput;
-    update?: XOR<
-      XOR<
-        UserUpdateToOneWithWhereWithoutTasksInput,
-        UserUpdateWithoutTasksInput
-      >,
-      UserUncheckedUpdateWithoutTasksInput
-    >;
+  export type EnumTaskPriorityFieldUpdateOperationsInput = {
+    set?: $Enums.TaskPriority;
   };
 
   export type ProjectUpdateOneRequiredWithoutTasksNestedInput = {
@@ -25243,6 +25264,25 @@ export namespace Prisma {
         ProjectUpdateWithoutTasksInput
       >,
       ProjectUncheckedUpdateWithoutTasksInput
+    >;
+  };
+
+  export type UserUpdateOneWithoutTasksNestedInput = {
+    create?: XOR<
+      UserCreateWithoutTasksInput,
+      UserUncheckedCreateWithoutTasksInput
+    >;
+    connectOrCreate?: UserCreateOrConnectWithoutTasksInput;
+    upsert?: UserUpsertWithoutTasksInput;
+    disconnect?: UserWhereInput | boolean;
+    delete?: UserWhereInput | boolean;
+    connect?: UserWhereUniqueInput;
+    update?: XOR<
+      XOR<
+        UserUpdateToOneWithWhereWithoutTasksInput,
+        UserUpdateWithoutTasksInput
+      >,
+      UserUncheckedUpdateWithoutTasksInput
     >;
   };
 
@@ -25342,14 +25382,6 @@ export namespace Prisma {
     >;
     connectOrCreate?: UserCreateOrConnectWithoutGithubActivitiesInput;
     connect?: UserWhereUniqueInput;
-  };
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number;
-    increment?: number;
-    decrement?: number;
-    multiply?: number;
-    divide?: number;
   };
 
   export type ProjectUpdateOneRequiredWithoutGithubDataNestedInput = {
@@ -25819,28 +25851,6 @@ export namespace Prisma {
       _max?: NestedEnumMemberStatusFilter<$PrismaModel>;
     };
 
-  export type NestedEnumTaskPriorityFilter<$PrismaModel = never> = {
-    equals?: $Enums.TaskPriority | EnumTaskPriorityFieldRefInput<$PrismaModel>;
-    in?:
-      | $Enums.TaskPriority[]
-      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-    notIn?:
-      | $Enums.TaskPriority[]
-      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-    not?: NestedEnumTaskPriorityFilter<$PrismaModel> | $Enums.TaskPriority;
-  };
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>;
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>;
-    lt?: number | FloatFieldRefInput<$PrismaModel>;
-    lte?: number | FloatFieldRefInput<$PrismaModel>;
-    gt?: number | FloatFieldRefInput<$PrismaModel>;
-    gte?: number | FloatFieldRefInput<$PrismaModel>;
-    not?: NestedFloatFilter<$PrismaModel> | number;
-  };
-
   export type NestedEnumTaskStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>;
     in?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>;
@@ -25859,26 +25869,34 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null;
   };
 
-  export type NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel = never> =
-    {
-      equals?:
-        | $Enums.TaskPriority
-        | EnumTaskPriorityFieldRefInput<$PrismaModel>;
-      in?:
-        | $Enums.TaskPriority[]
-        | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-      notIn?:
-        | $Enums.TaskPriority[]
-        | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
-      not?:
-        | NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel>
-        | $Enums.TaskPriority;
-      _count?: NestedIntFilter<$PrismaModel>;
-      _min?: NestedEnumTaskPriorityFilter<$PrismaModel>;
-      _max?: NestedEnumTaskPriorityFilter<$PrismaModel>;
-    };
+  export type NestedEnumTaskPriorityFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskPriority | EnumTaskPriorityFieldRefInput<$PrismaModel>;
+    in?:
+      | $Enums.TaskPriority[]
+      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+    notIn?:
+      | $Enums.TaskPriority[]
+      | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+    not?: NestedEnumTaskPriorityFilter<$PrismaModel> | $Enums.TaskPriority;
+  };
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>;
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
+    lt?: number | IntFieldRefInput<$PrismaModel>;
+    lte?: number | IntFieldRefInput<$PrismaModel>;
+    gt?: number | IntFieldRefInput<$PrismaModel>;
+    gte?: number | IntFieldRefInput<$PrismaModel>;
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number;
+    _count?: NestedIntFilter<$PrismaModel>;
+    _avg?: NestedFloatFilter<$PrismaModel>;
+    _sum?: NestedIntFilter<$PrismaModel>;
+    _min?: NestedIntFilter<$PrismaModel>;
+    _max?: NestedIntFilter<$PrismaModel>;
+  };
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>;
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>;
     notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>;
@@ -25886,12 +25904,7 @@ export namespace Prisma {
     lte?: number | FloatFieldRefInput<$PrismaModel>;
     gt?: number | FloatFieldRefInput<$PrismaModel>;
     gte?: number | FloatFieldRefInput<$PrismaModel>;
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number;
-    _count?: NestedIntFilter<$PrismaModel>;
-    _avg?: NestedFloatFilter<$PrismaModel>;
-    _sum?: NestedFloatFilter<$PrismaModel>;
-    _min?: NestedFloatFilter<$PrismaModel>;
-    _max?: NestedFloatFilter<$PrismaModel>;
+    not?: NestedFloatFilter<$PrismaModel> | number;
   };
 
   export type NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -25922,21 +25935,24 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>;
   };
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>;
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>;
-    lt?: number | IntFieldRefInput<$PrismaModel>;
-    lte?: number | IntFieldRefInput<$PrismaModel>;
-    gt?: number | IntFieldRefInput<$PrismaModel>;
-    gte?: number | IntFieldRefInput<$PrismaModel>;
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number;
-    _count?: NestedIntFilter<$PrismaModel>;
-    _avg?: NestedFloatFilter<$PrismaModel>;
-    _sum?: NestedIntFilter<$PrismaModel>;
-    _min?: NestedIntFilter<$PrismaModel>;
-    _max?: NestedIntFilter<$PrismaModel>;
-  };
+  export type NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel = never> =
+    {
+      equals?:
+        | $Enums.TaskPriority
+        | EnumTaskPriorityFieldRefInput<$PrismaModel>;
+      in?:
+        | $Enums.TaskPriority[]
+        | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+      notIn?:
+        | $Enums.TaskPriority[]
+        | ListEnumTaskPriorityFieldRefInput<$PrismaModel>;
+      not?:
+        | NestedEnumTaskPriorityWithAggregatesFilter<$PrismaModel>
+        | $Enums.TaskPriority;
+      _count?: NestedIntFilter<$PrismaModel>;
+      _min?: NestedEnumTaskPriorityFilter<$PrismaModel>;
+      _max?: NestedEnumTaskPriorityFilter<$PrismaModel>;
+    };
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<
@@ -26388,28 +26404,32 @@ export namespace Prisma {
 
   export type TaskCreateWithoutAssigneeInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
     project: ProjectCreateNestedOneWithoutTasksInput;
   };
 
   export type TaskUncheckedCreateWithoutAssigneeInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     projectId: string;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type TaskCreateOrConnectWithoutAssigneeInput = {
@@ -26888,16 +26908,18 @@ export namespace Prisma {
     OR?: TaskScalarWhereInput[];
     NOT?: TaskScalarWhereInput | TaskScalarWhereInput[];
     id?: StringFilter<"Task"> | string;
-    priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
     projectId?: StringFilter<"Task"> | string;
     title?: StringFilter<"Task"> | string;
     description?: StringNullableFilter<"Task"> | string | null;
-    weight?: FloatFilter<"Task"> | number;
+    weight?: IntFilter<"Task"> | number;
     status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus;
+    progress?: IntFilter<"Task"> | number;
     assigneeId?: StringNullableFilter<"Task"> | string | null;
     createdAt?: DateTimeFilter<"Task"> | Date | string;
+    updatedAt?: DateTimeFilter<"Task"> | Date | string;
     completedAt?: DateTimeNullableFilter<"Task"> | Date | string | null;
     score?: FloatNullableFilter<"Task"> | number | null;
+    priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority;
   };
 
   export type UserOAuthUpsertWithWhereUniqueWithoutUserInput = {
@@ -27423,28 +27445,32 @@ export namespace Prisma {
 
   export type TaskCreateWithoutProjectInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
     assignee?: UserCreateNestedOneWithoutTasksInput;
   };
 
   export type TaskUncheckedCreateWithoutProjectInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     assigneeId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type TaskCreateOrConnectWithoutProjectInput = {
@@ -27946,6 +27972,48 @@ export namespace Prisma {
     oauthAccounts?: UserOAuthUncheckedUpdateManyWithoutUserNestedInput;
   };
 
+  export type ProjectCreateWithoutTasksInput = {
+    id?: string;
+    name: string;
+    status?: $Enums.ProjectStatus;
+    description?: string | null;
+    githubRepo: string;
+    createdAt?: Date | string;
+    lastActive?: Date | string | null;
+    chatMessages?: ChatMessageCreateNestedManyWithoutProjectInput;
+    feedbacks?: FeedbackCreateNestedManyWithoutProjectInput;
+    githubData?: GitHubActivityCreateNestedManyWithoutProjectInput;
+    insights?: InsightCreateNestedManyWithoutProjectInput;
+    presenceLogs?: PresenceLogCreateNestedManyWithoutProjectInput;
+    createdBy: UserCreateNestedOneWithoutProjectsCreatedInput;
+    members?: ProjectMemberCreateNestedManyWithoutProjectInput;
+  };
+
+  export type ProjectUncheckedCreateWithoutTasksInput = {
+    id?: string;
+    name: string;
+    status?: $Enums.ProjectStatus;
+    description?: string | null;
+    githubRepo: string;
+    createdById: string;
+    createdAt?: Date | string;
+    lastActive?: Date | string | null;
+    chatMessages?: ChatMessageUncheckedCreateNestedManyWithoutProjectInput;
+    feedbacks?: FeedbackUncheckedCreateNestedManyWithoutProjectInput;
+    githubData?: GitHubActivityUncheckedCreateNestedManyWithoutProjectInput;
+    insights?: InsightUncheckedCreateNestedManyWithoutProjectInput;
+    presenceLogs?: PresenceLogUncheckedCreateNestedManyWithoutProjectInput;
+    members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput;
+  };
+
+  export type ProjectCreateOrConnectWithoutTasksInput = {
+    where: ProjectWhereUniqueInput;
+    create: XOR<
+      ProjectCreateWithoutTasksInput,
+      ProjectUncheckedCreateWithoutTasksInput
+    >;
+  };
+
   export type UserCreateWithoutTasksInput = {
     id?: string;
     name: string;
@@ -27994,110 +28062,6 @@ export namespace Prisma {
       UserCreateWithoutTasksInput,
       UserUncheckedCreateWithoutTasksInput
     >;
-  };
-
-  export type ProjectCreateWithoutTasksInput = {
-    id?: string;
-    name: string;
-    status?: $Enums.ProjectStatus;
-    description?: string | null;
-    githubRepo: string;
-    createdAt?: Date | string;
-    lastActive?: Date | string | null;
-    chatMessages?: ChatMessageCreateNestedManyWithoutProjectInput;
-    feedbacks?: FeedbackCreateNestedManyWithoutProjectInput;
-    githubData?: GitHubActivityCreateNestedManyWithoutProjectInput;
-    insights?: InsightCreateNestedManyWithoutProjectInput;
-    presenceLogs?: PresenceLogCreateNestedManyWithoutProjectInput;
-    createdBy: UserCreateNestedOneWithoutProjectsCreatedInput;
-    members?: ProjectMemberCreateNestedManyWithoutProjectInput;
-  };
-
-  export type ProjectUncheckedCreateWithoutTasksInput = {
-    id?: string;
-    name: string;
-    status?: $Enums.ProjectStatus;
-    description?: string | null;
-    githubRepo: string;
-    createdById: string;
-    createdAt?: Date | string;
-    lastActive?: Date | string | null;
-    chatMessages?: ChatMessageUncheckedCreateNestedManyWithoutProjectInput;
-    feedbacks?: FeedbackUncheckedCreateNestedManyWithoutProjectInput;
-    githubData?: GitHubActivityUncheckedCreateNestedManyWithoutProjectInput;
-    insights?: InsightUncheckedCreateNestedManyWithoutProjectInput;
-    presenceLogs?: PresenceLogUncheckedCreateNestedManyWithoutProjectInput;
-    members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput;
-  };
-
-  export type ProjectCreateOrConnectWithoutTasksInput = {
-    where: ProjectWhereUniqueInput;
-    create: XOR<
-      ProjectCreateWithoutTasksInput,
-      ProjectUncheckedCreateWithoutTasksInput
-    >;
-  };
-
-  export type UserUpsertWithoutTasksInput = {
-    update: XOR<
-      UserUpdateWithoutTasksInput,
-      UserUncheckedUpdateWithoutTasksInput
-    >;
-    create: XOR<
-      UserCreateWithoutTasksInput,
-      UserUncheckedCreateWithoutTasksInput
-    >;
-    where?: UserWhereInput;
-  };
-
-  export type UserUpdateToOneWithWhereWithoutTasksInput = {
-    where?: UserWhereInput;
-    data: XOR<
-      UserUpdateWithoutTasksInput,
-      UserUncheckedUpdateWithoutTasksInput
-    >;
-  };
-
-  export type UserUpdateWithoutTasksInput = {
-    id?: StringFieldUpdateOperationsInput | string;
-    name?: StringFieldUpdateOperationsInput | string;
-    email?: StringFieldUpdateOperationsInput | string;
-    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null;
-    oauthProvider?: StringFieldUpdateOperationsInput | string;
-    oauthId?: StringFieldUpdateOperationsInput | string;
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
-    messages?: ChatMessageUpdateManyWithoutSenderNestedInput;
-    receivedMessages?: ChatMessageUpdateManyWithoutRecipientNestedInput;
-    feedbackGiven?: FeedbackUpdateManyWithoutFromUserNestedInput;
-    feedbackReceived?: FeedbackUpdateManyWithoutToUserNestedInput;
-    githubActivities?: GitHubActivityUpdateManyWithoutUserNestedInput;
-    googleDocsData?: GoogleDocsDataUpdateOneWithoutUserNestedInput;
-    presenceLogs?: PresenceLogUpdateManyWithoutUserNestedInput;
-    projectsCreated?: ProjectUpdateManyWithoutCreatedByNestedInput;
-    memberships?: ProjectMemberUpdateManyWithoutUserNestedInput;
-    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput;
-    oauthAccounts?: UserOAuthUpdateManyWithoutUserNestedInput;
-  };
-
-  export type UserUncheckedUpdateWithoutTasksInput = {
-    id?: StringFieldUpdateOperationsInput | string;
-    name?: StringFieldUpdateOperationsInput | string;
-    email?: StringFieldUpdateOperationsInput | string;
-    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null;
-    oauthProvider?: StringFieldUpdateOperationsInput | string;
-    oauthId?: StringFieldUpdateOperationsInput | string;
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
-    messages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput;
-    receivedMessages?: ChatMessageUncheckedUpdateManyWithoutRecipientNestedInput;
-    feedbackGiven?: FeedbackUncheckedUpdateManyWithoutFromUserNestedInput;
-    feedbackReceived?: FeedbackUncheckedUpdateManyWithoutToUserNestedInput;
-    githubActivities?: GitHubActivityUncheckedUpdateManyWithoutUserNestedInput;
-    googleDocsData?: GoogleDocsDataUncheckedUpdateOneWithoutUserNestedInput;
-    presenceLogs?: PresenceLogUncheckedUpdateManyWithoutUserNestedInput;
-    projectsCreated?: ProjectUncheckedUpdateManyWithoutCreatedByNestedInput;
-    memberships?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput;
-    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
-    oauthAccounts?: UserOAuthUncheckedUpdateManyWithoutUserNestedInput;
   };
 
   export type ProjectUpsertWithoutTasksInput = {
@@ -28160,6 +28124,68 @@ export namespace Prisma {
     insights?: InsightUncheckedUpdateManyWithoutProjectNestedInput;
     presenceLogs?: PresenceLogUncheckedUpdateManyWithoutProjectNestedInput;
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput;
+  };
+
+  export type UserUpsertWithoutTasksInput = {
+    update: XOR<
+      UserUpdateWithoutTasksInput,
+      UserUncheckedUpdateWithoutTasksInput
+    >;
+    create: XOR<
+      UserCreateWithoutTasksInput,
+      UserUncheckedCreateWithoutTasksInput
+    >;
+    where?: UserWhereInput;
+  };
+
+  export type UserUpdateToOneWithWhereWithoutTasksInput = {
+    where?: UserWhereInput;
+    data: XOR<
+      UserUpdateWithoutTasksInput,
+      UserUncheckedUpdateWithoutTasksInput
+    >;
+  };
+
+  export type UserUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    name?: StringFieldUpdateOperationsInput | string;
+    email?: StringFieldUpdateOperationsInput | string;
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null;
+    oauthProvider?: StringFieldUpdateOperationsInput | string;
+    oauthId?: StringFieldUpdateOperationsInput | string;
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    messages?: ChatMessageUpdateManyWithoutSenderNestedInput;
+    receivedMessages?: ChatMessageUpdateManyWithoutRecipientNestedInput;
+    feedbackGiven?: FeedbackUpdateManyWithoutFromUserNestedInput;
+    feedbackReceived?: FeedbackUpdateManyWithoutToUserNestedInput;
+    githubActivities?: GitHubActivityUpdateManyWithoutUserNestedInput;
+    googleDocsData?: GoogleDocsDataUpdateOneWithoutUserNestedInput;
+    presenceLogs?: PresenceLogUpdateManyWithoutUserNestedInput;
+    projectsCreated?: ProjectUpdateManyWithoutCreatedByNestedInput;
+    memberships?: ProjectMemberUpdateManyWithoutUserNestedInput;
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput;
+    oauthAccounts?: UserOAuthUpdateManyWithoutUserNestedInput;
+  };
+
+  export type UserUncheckedUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    name?: StringFieldUpdateOperationsInput | string;
+    email?: StringFieldUpdateOperationsInput | string;
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null;
+    oauthProvider?: StringFieldUpdateOperationsInput | string;
+    oauthId?: StringFieldUpdateOperationsInput | string;
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    messages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedMessages?: ChatMessageUncheckedUpdateManyWithoutRecipientNestedInput;
+    feedbackGiven?: FeedbackUncheckedUpdateManyWithoutFromUserNestedInput;
+    feedbackReceived?: FeedbackUncheckedUpdateManyWithoutToUserNestedInput;
+    githubActivities?: GitHubActivityUncheckedUpdateManyWithoutUserNestedInput;
+    googleDocsData?: GoogleDocsDataUncheckedUpdateOneWithoutUserNestedInput;
+    presenceLogs?: PresenceLogUncheckedUpdateManyWithoutUserNestedInput;
+    projectsCreated?: ProjectUncheckedUpdateManyWithoutCreatedByNestedInput;
+    memberships?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput;
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    oauthAccounts?: UserOAuthUncheckedUpdateManyWithoutUserNestedInput;
   };
 
   export type ProjectCreateWithoutChatMessagesInput = {
@@ -29565,15 +29591,17 @@ export namespace Prisma {
 
   export type TaskCreateManyAssigneeInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     projectId: string;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type UserOAuthCreateManyUserInput = {
@@ -29948,53 +29976,59 @@ export namespace Prisma {
 
   export type TaskUpdateWithoutAssigneeInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     project?: ProjectUpdateOneRequiredWithoutTasksNestedInput;
   };
 
   export type TaskUncheckedUpdateWithoutAssigneeInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     projectId?: StringFieldUpdateOperationsInput | string;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type TaskUncheckedUpdateManyWithoutAssigneeInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     projectId?: StringFieldUpdateOperationsInput | string;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type UserOAuthUpdateWithoutUserInput = {
@@ -30103,15 +30137,17 @@ export namespace Prisma {
 
   export type TaskCreateManyProjectInput = {
     id?: string;
-    priority?: $Enums.TaskPriority;
     title: string;
     description?: string | null;
     weight?: number;
     status?: $Enums.TaskStatus;
+    progress?: number;
     assigneeId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     completedAt?: Date | string | null;
     score?: number | null;
+    priority?: $Enums.TaskPriority;
   };
 
   export type ChatMessageUpdateWithoutProjectInput = {
@@ -30323,53 +30359,59 @@ export namespace Prisma {
 
   export type TaskUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     assignee?: UserUpdateOneWithoutTasksNestedInput;
   };
 
   export type TaskUncheckedUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     assigneeId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   export type TaskUncheckedUpdateManyWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string;
-    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
     title?: StringFieldUpdateOperationsInput | string;
     description?: NullableStringFieldUpdateOperationsInput | string | null;
-    weight?: FloatFieldUpdateOperationsInput | number;
+    weight?: IntFieldUpdateOperationsInput | number;
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus;
+    progress?: IntFieldUpdateOperationsInput | number;
     assigneeId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     completedAt?:
       | NullableDateTimeFieldUpdateOperationsInput
       | Date
       | string
       | null;
     score?: NullableFloatFieldUpdateOperationsInput | number | null;
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority;
   };
 
   /**

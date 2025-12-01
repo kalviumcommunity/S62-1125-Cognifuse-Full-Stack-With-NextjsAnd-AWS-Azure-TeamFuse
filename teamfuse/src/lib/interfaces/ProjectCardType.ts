@@ -14,6 +14,6 @@ export default interface ProjectCardType {
     id: string;
     name: string;
     email: string;
-    avatarUrl: string;
+    avatarUrl?: string | null;
   };
 }
