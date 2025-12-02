@@ -1,14 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/withAuth";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
+import { User } from "@/lib/types/user";
 
-export const GET = withAuth(async (req, user) => {
+export async function GET(
+  req: NextRequest,
+  context: { params: Record<string, string> }
+) {
+  return withAuth(handler)(req, context);
+}
+
+async function handler(
+  req: NextRequest,
+  user: User,
+  context: { params: Record<string, string> }
+) {
   try {
     const sessions = await prisma.refreshToken.findMany({
       where: {
         userId: user.id,
-        revokedAt: null, // ✅ Only active sessions
+        revokedAt: null,
       },
       select: {
         id: true,
@@ -20,9 +32,7 @@ export const GET = withAuth(async (req, user) => {
         location: true,
         expiresAt: true,
       },
-      orderBy: {
-        lastUsedAt: "desc", // ✅ Most active session at top
-      },
+      orderBy: { lastUsedAt: "desc" },
     });
 
     return sendSuccess(
@@ -33,4 +43,4 @@ export const GET = withAuth(async (req, user) => {
     console.error("Error fetching user sessions:", error);
     return sendError("Internal Server Error", "INTERNAL_SERVER_ERROR", 500);
   }
-});
+}

@@ -6,7 +6,7 @@ import { sendSuccess, sendError } from "@/lib/responseHandler";
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      select: { id: true, name: true, email: true, createdAt: true },
       orderBy: { createdAt: "desc" },
     });
 

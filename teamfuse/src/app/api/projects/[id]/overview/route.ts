@@ -2,6 +2,10 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/withAuth";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
+import {
+  getProjectFromCache,
+  setProjectInCache,
+} from "@/lib/cache/projectCache";
 
 export const GET = withAuth(async (req: NextRequest, user) => {
   try {
@@ -21,6 +25,12 @@ export const GET = withAuth(async (req: NextRequest, user) => {
 
     if (!membership) {
       return sendError("Not authorized for this project", "FORBIDDEN", 403);
+    }
+
+    const cached = await getProjectFromCache(projectId);
+
+    if (cached) {
+      return sendSuccess(cached, "Overview cached");
     }
 
     const project = await prisma.project.findUnique({
@@ -65,6 +75,35 @@ export const GET = withAuth(async (req: NextRequest, user) => {
     };
 
     const latestInsight = project.insights[0] ?? null;
+
+    await setProjectInCache(projectId, {
+      project: {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        githubRepo: project.githubRepo,
+        updatedAt: project.lastActive ?? project.createdAt,
+        createdById: project.createdById,
+      },
+
+      members: project.members.map((m) => ({
+        memberId: m.id,
+        userId: m.user.id,
+        name: m.user.name,
+        email: m.user.email,
+        avatarUrl: m.user.avatarUrl,
+        role: m.role,
+        status: m.status,
+      })),
+
+      stats: {
+        tasks: taskSummary,
+        github: githubSummary,
+        messages: project.chatMessages.length,
+      },
+
+      latestInsight,
+    });
 
     return sendSuccess(
       {

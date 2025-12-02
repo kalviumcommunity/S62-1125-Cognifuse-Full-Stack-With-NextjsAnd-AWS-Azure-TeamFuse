@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sendError, sendSuccess } from "@/lib/responseHandler";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { withAuth } from "@/lib/withAuth";
+import { invalidateTaskCache } from "@/lib/cache/taskCache";
+import { invalidateProjectCache } from "@/lib/cache/projectCache";
 
 export const PATCH = withAuth(async (req: NextRequest, user) => {
   try {
@@ -28,6 +30,9 @@ export const PATCH = withAuth(async (req: NextRequest, user) => {
       where: { id: taskId },
       data: { status, updatedAt: new Date() },
     });
+
+    await invalidateTaskCache(projectId);
+    await invalidateProjectCache(projectId);
 
     return sendSuccess(updated, "Successfully updated the task");
   } catch (err) {

@@ -1,5 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getTasksFromCache,
+  invalidateTaskCache,
+  setTaskInCache,
+} from "@/lib/cache/taskCache";
+import { sendSuccess } from "@/lib/responseHandler";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
+import { invalidateProjectCache } from "@/lib/cache/projectCache";
 
 // GET /api/projects/[id]/tasks
 export async function GET(
@@ -9,16 +17,22 @@ export async function GET(
   const { id: projectId } = await context.params;
 
   try {
+    const cached = await getTasksFromCache(projectId);
+    if (cached) {
+      return sendSuccess(cached, "Hit Task cache");
+    }
+
     const tasks = await prisma.task.findMany({
       where: { projectId },
       include: { assignee: true },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(tasks);
+    await setTaskInCache(projectId, tasks);
+    return sendSuccess(tasks, "Tasks Fetched Successfully");
   } catch (err) {
     console.error("TASK GET ERROR:", err);
-    return new NextResponse("Failed to fetch tasks", { status: 500 });
+    return handleRouteError(err);
   }
 }
 
@@ -44,9 +58,11 @@ export async function POST(
       },
     });
 
-    return NextResponse.json(created);
+    await invalidateTaskCache(projectId);
+    await invalidateProjectCache(projectId);
+    return sendSuccess(created, "Task created successfully");
   } catch (err) {
     console.error("TASK CREATE ERROR:", err);
-    return new NextResponse("Failed to create task", { status: 500 });
+    return handleRouteError(err);
   }
 }

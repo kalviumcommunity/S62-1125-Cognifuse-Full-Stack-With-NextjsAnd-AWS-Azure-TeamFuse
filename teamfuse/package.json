@@ -9,7 +9,11 @@
     "start": "NODE_ENV=production tsx server.ts",
     "lint": "eslint",
     "seed": "dotenv -e .env.local -- node prisma/seed.js",
-    "db:push": "dotenv -e .env.local -- npx prisma db push"
+    "db:push": "dotenv -e .env.local -- npx prisma db push",
+    "sync:worker" : "dotenv -e .env.local -- tsx src/lib/queue/syncWorker.ts",
+    "webhook:worker" : "dotenv -e .env.local -- tsx src/lib/queue/webhookWorker.ts",
+    "sync_worker" : "tsx src/lib/queue/syncWorker.ts",
+    "webhook_worker" : "tsx src/lib/queue/webhookWorker.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -19,10 +23,12 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "bullmq": "^5.65.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
+    "ioredis": "^5.8.2",
     "jose": "^6.1.1",
     "lucide-react": "^0.552.0",
     "next": "^16.0.1",
@@ -53,7 +59,7 @@
     "prettier": "^3.6.2",
     "prisma": "^6.18.0",
     "tailwindcss": "^4",
-    "tsx": "^4.20.6",
+    "tsx": "^4.21.0",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5"
   },

@@ -8,7 +8,7 @@ export default interface ProjectCardType {
   lastActive: Date | null;
   createdAt: Date;
   commits?: number;
-  lastMessage?: string;
+  totalMessages?: number;
   tasksCompleted?: number;
   createdBy?: {
     id: string;

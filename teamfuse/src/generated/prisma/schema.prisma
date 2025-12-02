@@ -29,6 +29,7 @@ model User {
   refreshTokens    RefreshToken[]
   tasks            Task[]
   oauthAccounts    UserOAuth[]
+  projectSync      ProjectSync[]
 }
 
 model UserOAuth {
@@ -67,25 +68,100 @@ model RefreshToken {
 }
 
 model Project {
-  id           String           @id @default(uuid())
-  name         String
-  status       ProjectStatus    @default(ACTIVE)
-  description  String?
-  githubRepo   String
-  createdById  String
-  createdAt    DateTime         @default(now())
-  lastActive   DateTime?
-  chatMessages ChatMessage[]
-  feedbacks    Feedback[]
-  githubData   GitHubActivity[]
-  insights     Insight[]
-  presenceLogs PresenceLog[]
-  createdBy    User             @relation("ProjectsCreated", fields: [createdById], references: [id])
-  members      ProjectMember[]
-  tasks        Task[]
+  id                  String           @id @default(uuid())
+  name                String
+  status              ProjectStatus    @default(ACTIVE)
+  description         String?
+  githubRepo          String
+  githubRepoId        Int?
+  githubWebhookSecret String?
+  createdById         String
+  createdAt           DateTime         @default(now())
+  lastActive          DateTime?
+  chatMessages        ChatMessage[]
+  feedbacks           Feedback[]
+  githubData          GitHubActivity[]
+  insights            Insight[]
+  presenceLogs        PresenceLog[]
+  createdBy           User             @relation("ProjectsCreated", fields: [createdById], references: [id])
+  members             ProjectMember[]
+  tasks               Task[]
+
+  repoCommits     RepoCommit[]
+  pullRequest     PullRequest[]
+  webhookDelivery WebhookDelivery[]
+  projectSync     ProjectSync[]
 
   @@index([createdById])
   @@index([createdAt])
+}
+
+model RepoCommit {
+  id           String    @id @default(cuid())
+  projectId    String
+  sha          String    @unique
+  authorName   String?
+  authorEmail  String?
+  message      String
+  url          String?
+  authoredAt   DateTime?
+  addedLines   Int?
+  deletedLines Int?
+  raw          Json?
+  createdAt    DateTime  @default(now())
+  project      Project   @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+model PullRequest {
+  id          String    @id @default(cuid())
+  projectId   String
+  prNumber    Int
+  title       String
+  authorId    String?
+  authorLogin String?
+  state       String
+  merged      Boolean   @default(false)
+  mergedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+  raw         Json?
+  project     Project   @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, prNumber])
+  @@index([projectId])
+}
+
+model ProjectSync {
+  id         String     @id @default(cuid())
+  projectId  String
+  userId     String
+  status     SyncStatus @default(PENDING)
+  error      String?
+  createdAt  DateTime   @default(now())
+  finishedAt DateTime?
+  retried    Int        @default(0)
+
+  project Project @relation(fields: [projectId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model WebhookDelivery {
+  id          String                @id @default(cuid())
+  projectId   String?
+  deliveryId  String                @unique // X-GitHub-Delivery
+  event       String
+  status      WebhookDeliveryStatus @default(PENDING) // pending, processed, failed
+  error       String?
+  attempts    Int                   @default(0)
+  payload     Json
+  receivedAt  DateTime              @default(now())
+  processedAt DateTime?
+  project     Project?              @relation(fields: [projectId], references: [id])
+  retried     Int                   @default(0)
+
+  @@index([projectId])
 }
 
 model ProjectMember {
@@ -214,10 +290,10 @@ enum ProjectRole {
 }
 
 enum TaskStatus {
-  TODO
   IN_PROGRESS
   REVIEW
   DONE
+  TODO
 }
 
 enum TaskPriority {
@@ -236,4 +312,20 @@ enum ProjectStatus {
   ACTIVE
   ARCHIVED
   COMPLETED
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  PROCESSING
+  RETRYING
+}
+
+enum SyncStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  PROCESSING
+  RETRYING
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GitCommit, Clock, Brain, Activity } from "lucide-react";
 import ProjectCardType from "@/lib/interfaces/ProjectCardType";
@@ -51,7 +50,7 @@ export default function DashboardStats({
               {weeklyCommits.map((c, i) => (
                 <div
                   key={i}
-                  className="flex-1 rounded-t bg-gradient-to-t from-purple-500/30 to-purple-400/80"
+                  className="flex-1 rounded-t bg-linear-to-t from-purple-500/30 to-purple-400/80"
                   style={{ height: `${(c / 25) * 100}%` }}
                 />
               ))}
@@ -75,7 +74,7 @@ export default function DashboardStats({
         </Card>
 
         {/* AI Insight */}
-        <Card className="bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border-white/10 backdrop-blur-xl shadow-lg shadow-indigo-500/30">
+        <Card className="bg-linear-to-br from-indigo-500/20 to-purple-600/20 border-white/10 backdrop-blur-xl shadow-lg shadow-indigo-500/30">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-indigo-500/30 rounded-lg">

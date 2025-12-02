@@ -12,7 +12,6 @@ export default async function Page() {
   if (session) {
     projects = await getAllProjectsForUser(session.user.id);
   }
-  console.log("Projects fetched in dashboard page:", projects.pending);
   return (
     <TeamFuseDashboard
       projects={projects.accepted}

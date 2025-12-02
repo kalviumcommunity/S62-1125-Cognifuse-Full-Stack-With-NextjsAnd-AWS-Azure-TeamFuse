@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "../errors/AppError";
+import { getProjectFromCache, setProjectInCache } from "../cache/projectCache";
+import { ProjectTask } from "../types/projectTask";
 
 export async function getProjectById(projectId: string, userId: string) {
   try {
@@ -14,6 +16,11 @@ export async function getProjectById(projectId: string, userId: string) {
         "FORBIDDEN",
         403
       );
+    }
+
+    const cached = await getProjectFromCache(projectId);
+    if (cached) {
+      return cached;
     }
 
     // Fetch full project dashboard data
@@ -55,7 +62,6 @@ export async function getProjectById(projectId: string, userId: string) {
 
         githubData: {
           orderBy: { weekStart: "desc" },
-          take: 1,
         },
 
         insights: {
@@ -72,21 +78,42 @@ export async function getProjectById(projectId: string, userId: string) {
     // ---- Transform data for frontend ---- //
     const taskSummary = {
       total: project.tasks.length,
-      todo: project.tasks.filter((t) => t.status === "PENDING").length,
-      inProgress: project.tasks.filter((t) => t.status === "IN_PROGRESS")
+      todo: project.tasks.filter((t: ProjectTask) => t.status === "TODO")
         .length,
-      completed: project.tasks.filter((t) => t.status === "COMPLETED").length,
-      assignedToMe: project.tasks.filter((t) => t.assigneeId === userId).length,
+      inProgress: project.tasks.filter(
+        (t: ProjectTask) => t.status === "IN_PROGRESS"
+      ).length,
+      completed: project.tasks.filter((t: ProjectTask) => t.status === "DONE")
+        .length,
+      assignedToMe: project.tasks.filter(
+        (t: ProjectTask) => t.assigneeId === userId
+      ).length,
     };
 
-    const githubSummary = project.githubData[0] ?? {
-      commitCount: 0,
-      prCount: 0,
-      linesAdded: 0,
-      linesDeleted: 0,
-    };
+    const githubSummary = project.githubData.reduce(
+      (acc, item) => {
+        acc.commitCount += item.commitCount;
+        acc.prCount += item.prCount;
+        acc.linesAdded += item.linesAdded;
+        acc.linesDeleted += item.linesDeleted;
+        return acc;
+      },
+      {
+        commitCount: 0,
+        prCount: 0,
+        linesAdded: 0,
+        linesDeleted: 0,
+      }
+    );
 
     const latestInsight = project.insights[0] ?? null;
+
+    await setProjectInCache(projectId, {
+      project,
+      taskSummary,
+      githubSummary,
+      latestInsight,
+    });
 
     return { project, taskSummary, githubSummary, latestInsight };
   } catch (error) {
@@ -110,6 +137,14 @@ export async function getAllProjectsForUser(userId: string) {
             status: true,
           },
         },
+        githubData: {
+          orderBy: { weekStart: "desc" },
+        },
+        _count: {
+          select: {
+            chatMessages: true,
+          },
+        },
       },
     });
 
@@ -120,6 +155,9 @@ export async function getAllProjectsForUser(userId: string) {
         },
       },
       include: {
+        githubData: {
+          orderBy: { weekStart: "desc" },
+        },
         createdBy: {
           select: {
             id: true,
@@ -135,17 +173,30 @@ export async function getAllProjectsForUser(userId: string) {
             status: true,
           },
         },
+        _count: {
+          select: {
+            chatMessages: true,
+          },
+        },
       },
     });
+
+    // helper to get commit count from githubData (robust: checks common field names)
+    const getCommitCount = (githubData: { commitCount: number }[] = []) =>
+      githubData.reduce((sum, g) => sum + (g.commitCount ?? 0), 0);
 
     const accepted = acceptedRaw.map((p) => ({
       ...p,
       role: p.members[0]?.role ?? null,
+      commits: getCommitCount(p.githubData),
+      totalMessages: p._count.chatMessages,
     }));
 
     const pending = pendingRaw.map((p) => ({
       ...p,
       role: p.members[0]?.role ?? null,
+      commits: getCommitCount(p.githubData),
+      totalMessages: p._count.chatMessages,
     }));
 
     return { accepted, pending };

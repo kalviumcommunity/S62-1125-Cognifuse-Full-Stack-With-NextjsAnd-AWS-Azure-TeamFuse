@@ -7,6 +7,7 @@ export type ErrorCode =
   | "RATE_LIMIT"
   | "GITHUB_ERROR"
   | "BAD_REQUEST"
+  | "GITHUB_WEBHOOK_CREATE_FAILED"
   | "INTERNAL_ERROR";
 
 export class AppError extends Error {

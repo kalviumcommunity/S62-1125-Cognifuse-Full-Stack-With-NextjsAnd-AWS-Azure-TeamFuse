@@ -9,6 +9,7 @@ import { withAuth } from "@/lib/withAuth";
 import { getGitHubToken } from "@/lib/github/getGitHubToken";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { getAllProjectsForUser } from "@/lib/services/projectServices";
+import { ensureGithubWebhookForProject } from "@/lib/github/registerWebhook";
 
 export const POST = withAuth(async (req, user) => {
   try {
@@ -43,8 +44,20 @@ export const POST = withAuth(async (req, user) => {
       );
     }
 
+    const webhookData = await ensureGithubWebhookForProject(
+      session.accessToken,
+      owner,
+      repo
+    );
+
     // 5. Create project
-    const project = await createProject(user.id, name, description, githubRepo);
+    const project = await createProject(
+      user.id,
+      name,
+      description,
+      githubRepo,
+      webhookData
+    );
 
     // 6. Add members
     if (members && members?.length > 0) {

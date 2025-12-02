@@ -3,10 +3,16 @@ import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { prisma } from "@/lib/prisma";
 import { sendError, sendSuccess } from "@/lib/responseHandler";
 import { withAuth } from "@/lib/withAuth";
+import { User } from "@/lib/types/user";
+
+type ProjectMember = {
+  userId: string;
+  status: "ACCEPTED" | "PENDING" | "DECLINED";
+};
 
 export const POST = withAuth(async (req, user, context) => {
   try {
-    const params = await context?.params;
+    const params = context?.params;
     const projectId = params?.id;
     if (!projectId) {
       return sendError("Project ID is required", "BAD_REQUEST", 400);
@@ -37,14 +43,14 @@ export const POST = withAuth(async (req, user, context) => {
       select: { id: true, email: true },
     });
 
-    const existingEmails = users.map((u) => u.email);
+    const existingEmails = users.map((u: User) => u.email);
     const notFound = emails.filter((e) => !existingEmails.includes(e));
 
     // Check memberships
     const existingMembers = await prisma.projectMember.findMany({
       where: {
         projectId,
-        userId: { in: users.map((u) => u.id) },
+        userId: { in: users.map((u: User) => u.id) },
       },
       select: { userId: true, status: true },
     });
@@ -54,7 +60,9 @@ export const POST = withAuth(async (req, user, context) => {
     const canInvite = [];
 
     for (const u of users) {
-      const membership = existingMembers.find((m) => m.userId === u.id);
+      const membership = existingMembers.find(
+        (m: ProjectMember) => m.userId === u.id
+      );
 
       if (!membership) {
         canInvite.push(u.email); // fresh

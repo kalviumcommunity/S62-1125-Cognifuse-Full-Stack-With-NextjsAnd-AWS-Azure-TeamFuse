@@ -69,7 +69,11 @@ export const config = {
     "/api/protected/:path*",
     "/api/auth/sessions/:path*",
     "/dashboard/:path*",
-    "/api/projects/:path*",
     "/projects/:path*",
+    "/settings/:path*",
+    "/api/projects/:path*",
+    "/api/tasks/:path*",
+    "/api/messages/:path*",
+    "/api/feedback/:path*",
   ],
 };

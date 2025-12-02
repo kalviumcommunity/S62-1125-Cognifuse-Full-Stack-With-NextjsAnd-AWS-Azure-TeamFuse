@@ -1,33 +1,10 @@
-// import { NextResponse } from "next/server";
-// import { prisma } from "@/lib/prisma";
-
-// interface RouteParams {
-//   params: {
-//     id: string;
-//   };
-// }
-
-// export async function GET(_: Request, { params }: RouteParams) {
-//   const members = await prisma.projectMember.findMany({
-//     where: {
-//       projectId: params.id,
-//       status: "ACCEPTED",
-//     },
-//     select: {
-//       user: {
-//         select: {
-//           id: true,
-//           name: true,
-//         },
-//       },
-//     },
-//   });
-
-//   return NextResponse.json(members);
-// }
-
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getMembersFromCache,
+  setMembersInCache,
+} from "@/lib/cache/memberCache";
+import { sendSuccess } from "@/lib/responseHandler";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -37,7 +14,13 @@ export async function GET(_req: Request, { params }: RouteParams) {
   const { id: projectId } = await params; // unwrap await
 
   try {
-    // Fetch only accepted members in this project
+    const { id: projectId } = params;
+
+    const cached = await getMembersFromCache(projectId);
+    if (cached) {
+      return sendSuccess(cached, "Hit members cache");
+    }
+
     const members = await prisma.projectMember.findMany({
       where: {
         projectId,
@@ -53,17 +36,17 @@ export async function GET(_req: Request, { params }: RouteParams) {
       },
     });
 
+
     // Remove duplicates by user ID
     const uniqueMembers = Array.from(
       new Map(members.map((m) => [m.user.id, m.user])).values()
     );
+    await setMembersInCache(projectId, members);
 
-    return NextResponse.json(uniqueMembers);
-  } catch (error) {
-    console.error("MEMBERS FETCH ERROR:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch members" },
-      { status: 500 }
-    );
+    return sendSuccess(members, "Successfully fetched all the members");
+  } catch (e) {
+    console.error("MEMBER FETCH ERROR:", e);
+    return handleRouteError(e);
+
   }
 }

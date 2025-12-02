@@ -62,7 +62,7 @@ function DialogContent({
         className={cn(
           "fixed top-1/2 left-1/2 z-50 w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2",
           "rounded-2xl border border-white/10",
-          "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl",
+          "bg-linaer-to-br from-white/10 to-white/5 backdrop-blur-xl",
           "shadow-[0_8px_30px_rgba(0,0,0,0.25)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
@@ -90,10 +90,7 @@ function DialogContent({
   );
 }
 
-function DialogHeader({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
@@ -103,10 +100,7 @@ function DialogHeader({
   );
 }
 
-function DialogFooter({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-footer"
@@ -127,7 +121,7 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "text-xl font-bold bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent",
+        "text-xl font-bold bg-linear-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent",
         className
       )}
       {...props}

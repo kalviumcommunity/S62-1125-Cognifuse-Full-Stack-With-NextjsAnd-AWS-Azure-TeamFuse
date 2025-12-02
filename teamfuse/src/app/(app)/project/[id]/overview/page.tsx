@@ -17,7 +17,9 @@ export default async function OverviewTab({
   const currentUserId = session?.user?.id;
 
   // 2. No session or missing user ID
+  // 2. No session or missing user ID
   if (!currentUserId) {
+    return <div className="text-white p-6">Unauthorized</div>;
     return <div className="text-white p-6">Unauthorized</div>;
   }
 

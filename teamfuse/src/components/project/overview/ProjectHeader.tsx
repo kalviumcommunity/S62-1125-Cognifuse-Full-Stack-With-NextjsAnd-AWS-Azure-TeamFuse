@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Github, Clock } from "lucide-react";
+import SyncButton from "./SyncButton";
 
 export default function ProjectHeader({ overview }: { overview: any }) {
   return (
@@ -41,6 +42,8 @@ export default function ProjectHeader({ overview }: { overview: any }) {
         >
           <Github className="w-5 h-5" /> View Repo
         </a>
+
+        <SyncButton projectId={overview.id} />
       </div>
     </section>
   );
