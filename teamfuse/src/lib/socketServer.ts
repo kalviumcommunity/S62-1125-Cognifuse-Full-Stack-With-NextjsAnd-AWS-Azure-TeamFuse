@@ -6,6 +6,22 @@ const socketProjects = new Map<string, string>();
 
 export function socketServer(io: Server) {
   io.on("connection", (socket: Socket) => {
+    socket.on("join_chat", ({ projectId }) => {
+      socket.join(projectId);
+    });
+
+    socket.on("chat:send", ({ projectId, message }) => {
+      io.to(projectId).emit("chat:new", message);
+    });
+
+    socket.on("chat:typing", ({ projectId, userId }) => {
+      socket.to(projectId).emit("chat:typing", { userId });
+    });
+
+    socket.on("chat:stop_typing", ({ projectId, userId }) => {
+      socket.to(projectId).emit("chat:stop_typing", { userId });
+    });
+
     socket.on("join_project", async ({ projectId, userId }) => {
       socketProjects.set(socket.id, projectId);
       await socket.join(projectId);

@@ -64,5 +64,5 @@
       "eslint --ignore-pattern \"src/generated/**\" --fix",
       "prettier --write"
     ]
-  }
+  } 
 }

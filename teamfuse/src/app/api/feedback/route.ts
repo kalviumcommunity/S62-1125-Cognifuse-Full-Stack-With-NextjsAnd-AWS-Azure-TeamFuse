@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
 
@@ -27,7 +26,8 @@ export async function GET(req: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { fromUserId, toUserId, projectId, rating, comment } = await request.json();
+    const { fromUserId, toUserId, projectId, rating, comment } =
+      await request.json();
 
     const feedback = await prisma.feedback.create({
       data: { fromUserId, toUserId, projectId, rating, comment },
