@@ -9,14 +9,14 @@ function Authentication() {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   console.log("Session data:", session);
 
   const handleLogin = () => {
     setIsLoading(true);
     try {
       signIn("github", {
-        callbackUrl: searchParams.get("from") || "/dashboard",
+        // callbackUrl: searchParams.get("from") || "/dashboard",
       });
     } catch (error) {
       console.error("Error during sign in:", error);

@@ -3,6 +3,7 @@ import TeamMembers from "@/components/project/overview/TeamMembers";
 import QuickStats from "@/components/project/overview/QuickStats";
 import AISummary from "@/components/project/overview/AISummary";
 import { getProjectById } from "@/lib/services/projectServices";
+import { getProjectById } from "@/lib/services/projectServices";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
@@ -17,7 +18,9 @@ export default async function OverviewTab({
   const currentUserId = session?.user?.id;
 
   // 2. No session or missing user ID
+  // 2. No session or missing user ID
   if (!currentUserId) {
+    return <div className="text-white p-6">Unauthorized</div>;
     return <div className="text-white p-6">Unauthorized</div>;
   }
 
@@ -66,12 +69,15 @@ export default async function OverviewTab({
         }))}
         projectId={id as string}
         currentUserId={currentUserId}
+        projectId={id as string}
+        currentUserId={currentUserId}
       />
 
       <QuickStats
         stats={{
           tasks: taskSummary,
           github: githubSummary,
+          messages: project?.chatMessages?.length,
           messages: project?.chatMessages?.length,
         }}
       />
