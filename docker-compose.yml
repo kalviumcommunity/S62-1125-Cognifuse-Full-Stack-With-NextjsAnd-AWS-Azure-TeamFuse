@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   app:
     build: ./teamfuse
@@ -9,8 +11,46 @@ services:
     depends_on:
       - db
       - redis
+    restart: unless-stopped
     networks:
       - localnet
+    # optional healthcheck for app (adjust URL/path to your health endpoint)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/_health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  worker1:
+    build: ./teamfuse
+    container_name: worker_1
+    command: ["npm", "run", "sync_worker"]
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - localnet
+    healthcheck:
+      test: ["CMD-SHELL", "exit 0"] # lightweight placeholder; replace if you have a health probe
+
+  worker2:
+    build: ./teamfuse
+    container_name: worker_2
+    command: ["npm", "run", "webhook_worker"]
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - localnet
+    healthcheck:
+      test: ["CMD-SHELL", "exit 0"]
 
   db:
     image: postgres:15-alpine
@@ -26,14 +66,28 @@ services:
       - "5432:5432"
     networks:
       - localnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   redis:
-    image: redis:7-alpine
-    container_name: redis_cache
+    image: redis/redis-stack:latest
+    container_name: redis_stack
     ports:
       - "6379:6379"
+      - "8001:8001"
     networks:
       - localnet
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   localnet:

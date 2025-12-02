@@ -11,7 +11,9 @@
     "seed": "dotenv -e .env.local -- node prisma/seed.js",
     "db:push": "dotenv -e .env.local -- npx prisma db push",
     "sync:worker" : "dotenv -e .env.local -- tsx src/lib/queue/syncWorker.ts",
-    "webhook:worker" : "dotenv -e .env.local -- tsx src/lib/queue/webhookWorker.ts"
+    "webhook:worker" : "dotenv -e .env.local -- tsx src/lib/queue/webhookWorker.ts",
+    "sync_worker" : "tsx src/lib/queue/syncWorker.ts",
+    "webhook_worker" : "tsx src/lib/queue/webhookWorker.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -65,7 +67,6 @@
     "*.{ts,tsx,js,jsx}": [
       "eslint --ignore-pattern \"src/generated/**\" --fix",
       "prettier --write"
-    ],
-     "gitStash": false
+    ]
   } 
 }

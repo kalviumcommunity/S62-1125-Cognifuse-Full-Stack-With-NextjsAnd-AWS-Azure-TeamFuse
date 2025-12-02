@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  getFeedbackFromCache,
+  invalidateFeedbackCache,
+  setFeedbackInCache,
+} from "@/lib/cache/feedbackCache";
 import { prisma } from "../../../lib/prisma";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
 
@@ -7,6 +12,11 @@ export async function GET(req: Request) {
   const projectId = searchParams.get("projectId");
 
   if (!projectId) return sendError("Missing projectId", "MISSING_PARAM", 400);
+
+  const cached = await getFeedbackFromCache(projectId);
+  if (cached) {
+    return sendSuccess(cached, "Hit feedback cache");
+  }
 
   try {
     const feedbacks = await prisma.feedback.findMany({
@@ -17,6 +27,8 @@ export async function GET(req: Request) {
       },
       orderBy: { createdAt: "desc" },
     });
+
+    await setFeedbackInCache(projectId, feedbacks);
 
     return sendSuccess(feedbacks, "Feedbacks fetched successfully");
   } catch (error: any) {
@@ -32,6 +44,8 @@ export async function POST(request: Request) {
     const feedback = await prisma.feedback.create({
       data: { fromUserId, toUserId, projectId, rating, comment },
     });
+
+    await invalidateFeedbackCache(projectId);
 
     return sendSuccess(feedback, "Feedback created successfully", 201);
   } catch (error: any) {

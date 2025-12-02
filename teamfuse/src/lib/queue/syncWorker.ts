@@ -11,6 +11,7 @@ import { fetchRepoPRs } from "@/lib/github/fetchRepoPRs";
 import { updateRepoDb } from "@/lib/db/github/updateRepoDB";
 import { getGitHubToken } from "@/lib/github/getGitHubToken";
 import { parseRepoUrl } from "@/lib/github/parseRepoUrl";
+import { invalidateProjectCache } from "../cache/projectCache";
 
 async function handleSyncJob(job: Job<SyncJobData>) {
   const { syncId, projectId, userId } = job.data;
@@ -54,6 +55,8 @@ async function handleSyncJob(job: Job<SyncJobData>) {
     where: { id: projectId },
     data: { lastActive: new Date() },
   });
+
+  await invalidateProjectCache(projectId);
 
   await prisma.projectSync.update({
     where: { id: syncId },
@@ -106,6 +109,12 @@ export const syncWorker = new Worker<SyncJobData>(
 
 syncWorker.on("completed", (job) => {
   console.log(`[github:sync] Job ${job.id} completed`);
+});
+
+syncWorker.on("active", (job) => {
+  console.log(
+    `[github:sync] Job ${job?.id} processing for projectId: ${job.data.projectId}`
+  );
 });
 
 syncWorker.on("failed", (job, err) => {

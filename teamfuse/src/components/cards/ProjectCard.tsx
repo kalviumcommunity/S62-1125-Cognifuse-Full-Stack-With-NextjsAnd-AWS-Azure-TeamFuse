@@ -121,7 +121,7 @@ function ProjectCard({ project }: ProjectCardProps) {
 
             <div className="flex items-center gap-1.5 text-gray-400">
               <MessageSquare className="h-4 w-4 text-purple-300" />
-              <span>{project.lastMessage || "N/A"}</span>
+              <span>{project.totalMessages || 0}</span>
             </div>
           </div>
 

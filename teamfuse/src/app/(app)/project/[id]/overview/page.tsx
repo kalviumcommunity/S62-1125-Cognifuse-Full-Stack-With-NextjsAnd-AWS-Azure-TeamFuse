@@ -3,7 +3,6 @@ import TeamMembers from "@/components/project/overview/TeamMembers";
 import QuickStats from "@/components/project/overview/QuickStats";
 import AISummary from "@/components/project/overview/AISummary";
 import { getProjectById } from "@/lib/services/projectServices";
-import { getProjectById } from "@/lib/services/projectServices";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
@@ -69,15 +68,12 @@ export default async function OverviewTab({
         }))}
         projectId={id as string}
         currentUserId={currentUserId}
-        projectId={id as string}
-        currentUserId={currentUserId}
       />
 
       <QuickStats
         stats={{
           tasks: taskSummary,
           github: githubSummary,
-          messages: project?.chatMessages?.length,
           messages: project?.chatMessages?.length,
         }}
       />

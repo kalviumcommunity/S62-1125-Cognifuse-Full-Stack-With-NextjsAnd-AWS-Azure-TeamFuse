@@ -4,6 +4,7 @@ import { redis } from "@/lib/redis/connection";
 import { WebhookJobData } from "./queues";
 import { processWebhookEvent } from "@/lib/github/processWebhookEvent";
 import { prisma } from "../prisma";
+import { invalidateProjectCache } from "../cache/projectCache";
 
 async function handleWebhookJob(job: Job<WebhookJobData>) {
   const { deliveryId, projectId, event, payload } = job.data;
@@ -15,6 +16,8 @@ async function handleWebhookJob(job: Job<WebhookJobData>) {
 
   // Optional: mark delivery processed here too if you want
   await processWebhookEvent(projectId, event, payload);
+
+  await invalidateProjectCache(projectId);
 
   // ---- 3. MARK AS COMPLETED ----
   await prisma.webhookDelivery.update({
@@ -70,6 +73,12 @@ export const webhookWorker = new Worker<WebhookJobData>(
 // Optional logging
 webhookWorker.on("completed", (job) => {
   console.log(`[github:webhooks] Job ${job.id} completed`);
+});
+
+webhookWorker.on("active", (job) => {
+  console.log(
+    `[github:webhooks] Job ${job?.id} processing for projectId: ${job.data.projectId} event: ${job.data.event}`
+  );
 });
 
 webhookWorker.on("failed", (job, err) => {
