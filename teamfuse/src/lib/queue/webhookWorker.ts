@@ -9,7 +9,7 @@ async function handleWebhookJob(job: Job<WebhookJobData>) {
   const { deliveryId, projectId, event, payload } = job.data;
 
   await prisma.webhookDelivery.update({
-    where: { id: deliveryId },
+    where: { deliveryId },
     data: { status: "PROCESSING" },
   });
 
@@ -18,7 +18,7 @@ async function handleWebhookJob(job: Job<WebhookJobData>) {
 
   // ---- 3. MARK AS COMPLETED ----
   await prisma.webhookDelivery.update({
-    where: { id: deliveryId },
+    where: { deliveryId },
     data: {
       status: "COMPLETED",
       processedAt: new Date(),
@@ -27,19 +27,20 @@ async function handleWebhookJob(job: Job<WebhookJobData>) {
 }
 
 export const webhookWorker = new Worker<WebhookJobData>(
-  "github:webhooks",
+  "github_webhooks",
   async (job) => {
     try {
       await handleWebhookJob(job);
     } catch (err) {
       console.error("Webhook job failed:", err);
 
+      const { deliveryId } = job.data;
       // If more retries remain, DO NOT mark as permanently failed
       const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
 
       if (isLastAttempt && job.data.deliveryId) {
         await prisma.webhookDelivery.update({
-          where: { id: job.data.deliveryId },
+          where: { deliveryId },
           data: {
             status: "FAILED",
             processedAt: new Date(),

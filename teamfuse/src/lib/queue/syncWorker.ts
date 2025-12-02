@@ -1,4 +1,7 @@
 // lib/github/queue/syncWorker.ts
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import { Worker, Job } from "bullmq";
 import { redis } from "@/lib/redis/connection";
 import { SyncJobData } from "./queues";
@@ -62,7 +65,7 @@ async function handleSyncJob(job: Job<SyncJobData>) {
 }
 
 export const syncWorker = new Worker<SyncJobData>(
-  "github:sync",
+  "github_sync",
   async (job) => {
     try {
       await handleSyncJob(job);

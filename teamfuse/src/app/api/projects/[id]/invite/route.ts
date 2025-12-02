@@ -6,7 +6,7 @@ import { withAuth } from "@/lib/withAuth";
 
 export const POST = withAuth(async (req, user, context) => {
   try {
-    const params = await context?.params;
+    const params = context?.params;
     const projectId = params?.id;
     if (!projectId) {
       return sendError("Project ID is required", "BAD_REQUEST", 400);

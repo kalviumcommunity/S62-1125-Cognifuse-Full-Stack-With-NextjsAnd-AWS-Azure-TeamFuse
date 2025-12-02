@@ -1,3 +1,4 @@
+import { invalidateProjectCache } from "@/lib/cache/projectCache";
 import { respondToInvite } from "@/lib/db/members/respondToInvite";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { sendError, sendSuccess } from "@/lib/responseHandler";
@@ -5,7 +6,7 @@ import { withAuth } from "@/lib/withAuth";
 
 export const POST = withAuth(async (req, user, context) => {
   try {
-    const params = await context?.params;
+    const params = context?.params;
     const projectId = params?.id;
 
     if (!projectId) {
@@ -19,6 +20,10 @@ export const POST = withAuth(async (req, user, context) => {
     }
 
     const updated = await respondToInvite(projectId, user.id, action);
+
+    if (action == "ACCEPT") {
+      invalidateProjectCache(projectId);
+    }
 
     return sendSuccess(
       updated,

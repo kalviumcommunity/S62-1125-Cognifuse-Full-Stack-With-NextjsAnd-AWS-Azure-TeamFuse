@@ -6,6 +6,11 @@ type RepoInfo = {
   full_name: string; // "owner/repo"
 };
 
+export type webhookData = {
+  githubRepoId: number;
+  githubWebhookSecret: string;
+};
+
 async function fetchRepoInfo(
   token: string,
   owner: string,

@@ -290,10 +290,17 @@ enum ProjectRole {
 }
 
 enum TaskStatus {
+<<<<<<< Updated upstream
   TODO
   IN_PROGRESS
   REVIEW
   DONE
+=======
+  IN_PROGRESS
+  REVIEW
+  DONE
+  TODO
+>>>>>>> Stashed changes
 }
 
 enum TaskPriority {

@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     where: {
       OR: [
         { githubRepoId: repo.id ?? undefined },
-        { githubRepo: repo.full_name ?? undefined },
+        { githubRepo: `https://github.com/${repo.full_name ?? undefined}` },
       ],
     },
   });

@@ -15,7 +15,7 @@ export interface SyncJobData {
   userId: string;
 }
 
-export const githubWebhookQueue = new Queue<WebhookJobData>("github:webhooks", {
+export const githubWebhookQueue = new Queue<WebhookJobData>("github_webhooks", {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
@@ -28,7 +28,7 @@ export const githubWebhookQueue = new Queue<WebhookJobData>("github:webhooks", {
   },
 });
 
-export const githubSyncQueue = new Queue<SyncJobData>("github:sync", {
+export const githubSyncQueue = new Queue<SyncJobData>("github_sync", {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
