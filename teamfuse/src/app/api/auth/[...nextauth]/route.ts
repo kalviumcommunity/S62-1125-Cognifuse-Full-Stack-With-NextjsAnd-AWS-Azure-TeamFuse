@@ -1,3 +1,5 @@
+"use server";
+
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import { runOAuthFlow } from "@/lib/auth/runOAuthFlow";

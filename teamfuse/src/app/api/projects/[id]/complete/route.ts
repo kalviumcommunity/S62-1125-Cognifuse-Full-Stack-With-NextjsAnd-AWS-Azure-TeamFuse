@@ -39,7 +39,14 @@ export async function POST(
           403
         );
       }
-
+      if (updateResult.count === 0) {
+        // Either project doesn't exist or user isn't owner
+        return sendError(
+          "You are not allowed to update this project",
+          "FORBIDDEN",
+          403
+        );
+      }
       // Fetch the project with members so we can return it and invalidate caches
       const project = await prisma.project.findUnique({
         where: { id: projectId },
@@ -50,6 +57,10 @@ export async function POST(
         },
       });
 
+      if (!project) {
+        // Extremely unlikely because updateMany succeeded, but safe-guard
+        return sendError("Project not found after update", "NOT_FOUND", 404);
+      }
       if (!project) {
         // Extremely unlikely because updateMany succeeded, but safe-guard
         return sendError("Project not found after update", "NOT_FOUND", 404);
@@ -78,7 +89,27 @@ export async function POST(
           }
         })
       );
+      // run invalidations in parallel but don't crash route if one fails
+      await Promise.all(
+        Array.from(userIdsToInvalidate).map(async (uid) => {
+          try {
+            await invalidateUserProjectCache(uid);
+          } catch (err) {
+            console.error(
+              `Failed to invalidate userProjectCache for ${uid}`,
+              err
+            );
+            // swallow error so invalidation failure doesn't break the API response
+          }
+        })
+      );
 
+      // invalidate project-specific cache
+      try {
+        await invalidateProjectCache(projectId);
+      } catch (err) {
+        console.error("Failed to invalidate project cache", err);
+      }
       // invalidate project-specific cache
       try {
         await invalidateProjectCache(projectId);

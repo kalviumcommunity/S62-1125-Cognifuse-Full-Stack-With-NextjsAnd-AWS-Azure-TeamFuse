@@ -44,14 +44,10 @@ export async function ensureGithubWebhookForProject(
 ) {
   const repoInfo = await fetchRepoInfo(token, owner, repo);
 
-  console.log("repoInfo", repoInfo);
-
   // generate secret and create webhook
   const rawSecret = generateWebhookSecret();
 
   const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/github`;
-
-  console.log("Creating webhook for", owner, repo, "->", webhookUrl);
 
   const res = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/hooks`,
@@ -77,11 +73,9 @@ export async function ensureGithubWebhookForProject(
   );
 
   const body = await res.json();
-  console.log("create hook status", res.status, body);
 
   if (!res.ok && res.status !== 422) {
     // 422 often means "hook already exists with same config"
-    console.log("Full response body:", body);
     throw new AppError(
       `Failed to create GitHub webhook: ${res.status}`,
       "GITHUB_ERROR",

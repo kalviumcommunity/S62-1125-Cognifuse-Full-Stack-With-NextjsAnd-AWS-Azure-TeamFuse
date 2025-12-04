@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { EmailConfig } from "next-auth/providers/email";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { prisma } from "../../../../lib/prisma";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
 
@@ -26,21 +25,22 @@ export async function GET(
     }
 
     return sendSuccess(user, "User fetched successfully");
-  } catch (error: any) {
-    return sendError(error.message, "FETCH_ERROR", 500, error);
+  } catch (err) {
+    console.log("Error in GET users", err);
+    return handleRouteError(err);
   }
 }
 
 // PUT /api/users/[id]
 export async function PUT(
-  request: Request,
+  req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;
     const id = params.id;
 
-    const data = await request.json();
+    const data = await req.json();
 
     const updated = await prisma.user.update({
       where: { id },
@@ -48,8 +48,9 @@ export async function PUT(
     });
 
     return sendSuccess(updated, "User updated successfully");
-  } catch (error: any) {
-    return sendError(error.message, "UPDATE_ERROR", 500, error);
+  } catch (err) {
+    console.error("Error in PUT users", err);
+    return handleRouteError(err);
   }
 }
 
@@ -64,7 +65,8 @@ export async function DELETE(
     await prisma.user.delete({ where: { id } });
 
     return sendSuccess(null, "User deleted successfully");
-  } catch (error: any) {
-    return sendError(error.message, "DELETE_ERROR", 500, error);
+  } catch (err) {
+    console.error("Error in DELETE user", err);
+    return handleRouteError(err);
   }
 }

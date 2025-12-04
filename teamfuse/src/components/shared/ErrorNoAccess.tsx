@@ -9,7 +9,7 @@ export default function ErrorNoAccess() {
         You don’t have permission to access this project.
       </p>
       <Link
-        href="/"
+        href={{ pathname: "/" }}
         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md transition"
       >
         Go Home

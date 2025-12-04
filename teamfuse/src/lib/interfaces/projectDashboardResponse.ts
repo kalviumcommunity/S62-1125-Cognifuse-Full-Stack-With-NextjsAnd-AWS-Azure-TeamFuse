@@ -9,7 +9,6 @@ export interface ProjectDashboardResponse {
     todo: number;
     inProgress: number;
     completed: number;
-    assignedToMe: number;
   };
 
   githubSummary: {

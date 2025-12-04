@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Code2, Shield } from "lucide-react";
 import Authentication from "@/components/auth/Authentication";
+import { Suspense } from "react";
 
 export default function Auth() {
   return (
@@ -34,7 +35,9 @@ export default function Auth() {
 
           <CardContent className="space-y-6">
             {/* GitHub Sign In Button */}
-            <Authentication />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Authentication />
+            </Suspense>
 
             {/* Security Note */}
             <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">

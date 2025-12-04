@@ -56,7 +56,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "baseline-browser-mapping": "^2.8.32",
+    "baseline-browser-mapping": "^2.9.0",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.0",
     "eslint-config-next": "^16.0.1",
@@ -70,7 +70,7 @@
     "tw-animate-css": "^1.4.0",
     "typescript": "^5"
   },
- "lint-staged": {
+  "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --ignore-pattern \"src/generated/**\" --fix",
       "prettier --write"

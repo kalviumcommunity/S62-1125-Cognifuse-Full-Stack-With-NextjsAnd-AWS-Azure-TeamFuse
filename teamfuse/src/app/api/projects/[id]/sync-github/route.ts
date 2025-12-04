@@ -16,7 +16,7 @@ export async function POST(
   const projectId = params.id;
   if (!projectId) return sendError("Missing project ID", "BAD_REQUEST", 400);
 
-  return withAuth(async (req: NextRequest, user) => {
+  return withAuth(async (_req: NextRequest, user) => {
     try {
       // --- 1. CHECK PROJECT EXISTS ---
       const project = await prisma.project.findUnique({

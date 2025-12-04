@@ -17,8 +17,9 @@ type EmptyParams = Record<string, never>;
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: EmptyParams } // explicit empty params type that won't trigger the linter
+  context: { params: Promise<EmptyParams> } // explicit empty params type that won't trigger the linter
 ) {
+  const params = await context.params;
   return withAuth(async (req: NextRequest, user) => {
     try {
       // validate GitHub token for user

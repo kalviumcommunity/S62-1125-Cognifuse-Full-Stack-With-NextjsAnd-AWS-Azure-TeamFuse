@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Authentication from "@/components/auth/Authentication";
+import { Suspense } from "react";
 
 export default function LandingPage() {
   const features = [
@@ -156,7 +157,9 @@ export default function LandingPage() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <Authentication />
+              <Suspense fallback={<div>Loading...</div>}>
+                <Authentication />
+              </Suspense>
 
               {/* Benefits List */}
               <div className="space-y-3 pt-4 border-t border-white/10">

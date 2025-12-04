@@ -1,9 +1,5 @@
-// components/project/Sidebar.tsx
+"use client";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { getMemberDetails } from "@/lib/services/memberServices";
-import { headers } from "next/headers";
 import {
   LayoutDashboard,
   ListTodo,
@@ -12,26 +8,22 @@ import {
   Settings2,
   User,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ProjectMember } from "@/generated/prisma";
 
-type Props = { projectId: string };
+type Props = { projectId: string; member: ProjectMember };
 
-export default async function Sidebar({ projectId }: Props) {
-  // Get current pathname from request headers (server-side)
-  const h = await headers();
-  const pathname = h.get("next-url") || ""; // Next.js automatically injects this
+// helper: convert string -> UrlObject-like shape for Link
+function makeHref(href: string) {
+  // Link expects UrlObject | RouteImpl<string> in your setup.
+  // Provide an object with pathname and cast to the expected type.
+  // This keeps intent clear while satisfying TypeScript.
+  return { pathname: href } as unknown as Parameters<typeof Link>[0]["href"];
+}
 
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+export default function Sidebar({ projectId, member }: Props) {
+  const pathname = usePathname();
 
-  if (!userId) {
-    return (
-      <aside className="w-64 p-6 hidden md:block">
-        <p className="text-red-400">You are not logged in.</p>
-      </aside>
-    );
-  }
-
-  const member = await getMemberDetails(projectId, userId);
   const role = member?.role ?? null;
 
   const links = [
@@ -54,7 +46,7 @@ export default async function Sidebar({ projectId }: Props) {
     },
   ];
 
-  if (role === "LEADER" || role === "ADMIN") {
+  if (role === "LEADER") {
     links.push({
       label: "Manage",
       href: `/project/${projectId}/manage`,
@@ -65,7 +57,7 @@ export default async function Sidebar({ projectId }: Props) {
   return (
     <aside className="w-64 border-r border-gray-800/50 p-6 hidden md:block bg-gradient-to-b from-gray-900/50 to-gray-950/50 backdrop-blur-xl">
       <div className="mb-8">
-        <Link href={"/dashboard"}>
+        <Link href={makeHref("/dashboard")}>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
             Dashboard
           </h2>
@@ -74,12 +66,13 @@ export default async function Sidebar({ projectId }: Props) {
 
       <nav className="space-y-2">
         {links.map(({ label, href, icon: Icon }) => {
+          console.log("pathname", pathname, " href ", href);
           const isActive = pathname === href;
 
           return (
             <Link
               key={href}
-              href={href}
+              href={makeHref(href)}
               className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 isActive
                   ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-300 border border-purple-500/30 shadow-lg shadow-purple-500/10"

@@ -1,6 +1,7 @@
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { prisma } from "@/lib/prisma";
 import { sendSuccess, sendError } from "@/lib/responseHandler";
+import { NextRequest } from "next/server";
 
 // Utility type for JSON parsing
 type CreateUserBody = {
@@ -26,9 +27,9 @@ export async function GET() {
 }
 
 // POST /api/users — create a new user
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = (await request.json()) as Partial<CreateUserBody>;
+    const body = (await req.json()) as Partial<CreateUserBody>;
 
     if (!body.name || !body.email || !body.oauthId) {
       return sendError("Missing required fields", "VALIDATION_ERROR", 400);
