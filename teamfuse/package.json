@@ -13,7 +13,8 @@
     "sync:worker": "dotenv -e .env.local -- tsx src/lib/queue/syncWorker.ts",
     "webhook:worker": "dotenv -e .env.local -- tsx src/lib/queue/webhookWorker.ts",
     "sync_worker": "tsx src/lib/queue/syncWorker.ts",
-    "webhook_worker": "tsx src/lib/queue/webhookWorker.ts"
+    "webhook_worker": "tsx src/lib/queue/webhookWorker.ts",
+    "start:workers": "tsx runWorkers.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -72,7 +73,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "eslint --ignore-pattern \"src/generated/**\" --fix",
+      "sh -c 'echo \"$1\" | grep -v \"src/generated/\" >/dev/null' --",
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,md,css,scss}": [
       "prettier --write"
     ]
   }

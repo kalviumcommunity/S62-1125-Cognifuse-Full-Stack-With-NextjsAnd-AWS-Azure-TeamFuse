@@ -198,104 +198,110 @@ export async function getProjectById(projectId: string, userId: string) {
  * Also populates a small `role`, commit count and message count for listing UI.
  */
 export async function getAllProjectsForUser(userId: string) {
-  const cached = await getUserProjectFromCache(userId);
-  if (cached) return cached;
-
-  const acceptedRaw = await prisma.project.findMany({
-    where: {
-      members: {
-        some: { userId, status: "ACCEPTED" },
-      },
-    },
-    include: {
-      members: {
-        where: { userId },
-        select: {
-          role: true,
-          status: true,
-        },
-      },
-      githubData: {
-        orderBy: { weekStart: "desc" },
-      },
-      _count: {
-        select: {
-          chatMessages: true,
-        },
-      },
-    },
-  });
-
-  const pendingRaw = await prisma.project.findMany({
-    where: {
-      members: {
-        some: { userId, status: "PENDING" },
-      },
-    },
-    include: {
-      githubData: {
-        orderBy: { weekStart: "desc" },
-      },
-      createdBy: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatarUrl: true,
-        },
-      },
-      members: {
-        where: { userId },
-        select: {
-          role: true,
-          status: true,
-        },
-      },
-      _count: {
-        select: {
-          chatMessages: true,
-        },
-      },
-    },
-  });
-
-  const getCommitCount = (
-    githubData: (Pick<GitHubActivity, "commitCount"> & {
-      commitCount?: number;
-    })[] = []
-  ) => githubData.reduce((sum, g) => sum + (g.commitCount ?? 0), 0);
-
-  const accepted = acceptedRaw.map((p) => ({
-    ...p,
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    githubRepo: p.githubRepo,
-    createdAt: p.createdAt,
-    role: p.members?.[0]?.role ?? null,
-    commits: getCommitCount(p.githubData),
-    totalMessages: p._count?.chatMessages ?? 0,
-    // include any additional fields you need for listing
-  }));
-
-  const pending = pendingRaw.map((p) => ({
-    ...p,
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    githubRepo: p.githubRepo,
-    createdAt: p.createdAt,
-    role: p.members?.[0]?.role ?? null,
-    commits: getCommitCount(p.githubData),
-    totalMessages: p._count?.chatMessages ?? 0,
-  }));
-
-  // cache best-effort
   try {
-    await setUserProjectInCache(userId, { accepted, pending });
-  } catch (cacheErr) {
-    console.warn("Failed to set user projects in cache:", cacheErr);
-  }
+    const cached = await getUserProjectFromCache(userId);
+    if (cached) {
+      return cached;
+    }
+    const acceptedRaw = await prisma.project.findMany({
+      where: {
+        members: {
+          some: { userId, status: "ACCEPTED" },
+        },
+      },
+      include: {
+        members: {
+          where: { userId },
+          select: {
+            role: true,
+            status: true,
+          },
+        },
+        githubData: {
+          orderBy: { weekStart: "desc" },
+        },
+        _count: {
+          select: {
+            chatMessages: true,
+          },
+        },
+      },
+    });
 
-  return { accepted, pending };
+    const pendingRaw = await prisma.project.findMany({
+      where: {
+        members: {
+          some: { userId, status: "PENDING" },
+        },
+      },
+      include: {
+        githubData: {
+          orderBy: { weekStart: "desc" },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+        members: {
+          where: { userId },
+          select: {
+            role: true,
+            status: true,
+          },
+        },
+        _count: {
+          select: {
+            chatMessages: true,
+          },
+        },
+      },
+    });
+
+    const getCommitCount = (
+      githubData: (Pick<GitHubActivity, "commitCount"> & {
+        commitCount?: number;
+      })[] = []
+    ) => githubData.reduce((sum, g) => sum + (g.commitCount ?? 0), 0);
+
+    const accepted = acceptedRaw.map((p) => ({
+      ...p,
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      githubRepo: p.githubRepo,
+      createdAt: p.createdAt,
+      role: p.members?.[0]?.role ?? null,
+      commits: getCommitCount(p.githubData),
+      totalMessages: p._count?.chatMessages ?? 0,
+      // include any additional fields you need for listing
+    }));
+
+    const pending = pendingRaw.map((p) => ({
+      ...p,
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      githubRepo: p.githubRepo,
+      createdAt: p.createdAt,
+      role: p.members?.[0]?.role ?? null,
+      commits: getCommitCount(p.githubData),
+      totalMessages: p._count?.chatMessages ?? 0,
+    }));
+
+    // cache best-effort
+    try {
+      await setUserProjectInCache(userId, { accepted, pending });
+    } catch (cacheErr) {
+      console.warn("Failed to set user projects in cache:", cacheErr);
+    }
+
+    return { accepted, pending };
+  } catch (err) {
+    console.error("Error In getAllProjectsForUser", err);
+    throw err;
+  }
 }

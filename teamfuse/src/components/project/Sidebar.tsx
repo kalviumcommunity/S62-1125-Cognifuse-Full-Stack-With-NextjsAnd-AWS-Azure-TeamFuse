@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   ListTodo,
@@ -8,7 +9,6 @@ import {
   Settings2,
   User,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { ProjectMember } from "@/generated/prisma";
 
 type Props = { projectId: string; member: ProjectMember };
@@ -66,7 +66,6 @@ export default function Sidebar({ projectId, member }: Props) {
 
       <nav className="space-y-2">
         {links.map(({ label, href, icon: Icon }) => {
-          console.log("pathname", pathname, " href ", href);
           const isActive = pathname === href;
 
           return (
