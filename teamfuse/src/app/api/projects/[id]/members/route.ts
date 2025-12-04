@@ -10,7 +10,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
   try {
     const { id: projectId } = await params;
 
-    const members = getProjectMembers(projectId);
+    const members = await getProjectMembers(projectId);
 
     return sendSuccess(members, "Successfully fetched all the members");
   } catch (e) {

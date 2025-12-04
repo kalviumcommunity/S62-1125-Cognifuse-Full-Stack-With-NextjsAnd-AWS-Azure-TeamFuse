@@ -396,7 +396,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Kalvium project\\S62-1125-Cognifuse-Full-Stack-With-NextjsAnd-AWS-Azure-TeamFuse\\teamfuse\\src\\generated\\prisma",
+      "value": "C:\\Users\\adrin\\OneDrive\\Desktop\\S62-1125-Cognifuse-Full-Stack-With-NextjsAnd-AWS-Azure-TeamFuse\\teamfuse\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -414,12 +414,12 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Kalvium project\\S62-1125-Cognifuse-Full-Stack-With-NextjsAnd-AWS-Azure-TeamFuse\\teamfuse\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\adrin\\OneDrive\\Desktop\\S62-1125-Cognifuse-Full-Stack-With-NextjsAnd-AWS-Azure-TeamFuse\\teamfuse\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
     "rootEnvPath": null,
-    "schemaEnvPath": "../../../prisma/.env"
+    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.18.0",

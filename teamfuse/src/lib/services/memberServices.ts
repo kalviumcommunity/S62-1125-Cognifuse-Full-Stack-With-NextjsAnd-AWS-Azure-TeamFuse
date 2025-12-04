@@ -4,13 +4,12 @@ import {
   setProjectMemberInCache,
 } from "../cache/projectMemberCache";
 import { prisma } from "../prisma";
-import { sendSuccess } from "../responseHandler";
 
 export const getProjectMembers = async (projectId: string) => {
   try {
     const cached = await getMembersFromCache(projectId);
     if (cached) {
-      return sendSuccess(cached, "Hit members cache");
+      return cached;
     }
 
     const members = await prisma.projectMember.findMany({
@@ -30,6 +29,8 @@ export const getProjectMembers = async (projectId: string) => {
 
     // Remove duplicates by user ID
     await setMembersInCache(projectId, members);
+
+    return members;
   } catch (err) {
     console.error("Error in fetch members service", err);
     throw err;

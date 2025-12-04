@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import TaskBoard from "@/components/project/tasks/TaskBoard";
-import FairnessChart from "@/components/project/tasks/FairnessChart";
-import Insights from "@/components/project/tasks/Insights";
 import CreateTaskModal from "@/components/project/tasks/CreateTaskModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+// ⬇️ NEW IMPORTS
+import FairnessChart from "@/components/project/tasks/FairnessChart";
+import QuickStats from "@/components/project/tasks/QuickStats";
 
 export default function TaskSpacePage() {
   const params = useParams<{ id: string }>();
@@ -19,123 +20,84 @@ export default function TaskSpacePage() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (!projectId) return;
 
     try {
       const res = await fetch(`/api/projects/${projectId}/tasks`, {
         cache: "no-store",
       });
-      if (res.ok) {
-        const data = await res.json();
-        setTasks(data);
-      }
-    } catch (e) {
-      console.error("TASK FETCH ERROR:", e);
-    }
-  };
+      const data = await res.json();
 
-  useEffect(() => {
-    fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (Array.isArray(data.data)) {
+        setTasks(data.data);
+      } else {
+        setTasks([]);
+      }
+    } catch {
+      setTasks([]);
+    }
   }, [projectId]);
 
-  const filtered = tasks.filter((t) =>
-    t.title.toLowerCase().includes(q.toLowerCase())
-  );
+  useEffect(() => {
+    const load = async () => {
+      await fetchTasks();
+    };
+    load();
+  }, [fetchTasks]);
+
+  const filtered = Array.isArray(tasks)
+    ? tasks.filter((t) =>
+        t?.title?.toLowerCase()?.includes(q.toLowerCase())
+      )
+    : [];
 
   return (
-    <div className="min-h-screen relative bg-linear-to-b from-[#0f111a] via-[#141620] to-[#1a1c25] text-white overflow-hidden">
-      {/* Background lights */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[420px] h-[420px] bg-indigo-600/20 blur-[100px] rounded-full pointer-events-none" />
-
-      <div className="flex relative z-10">
-        {/* SIDEBAR */}
-        <aside className="w-80 bg-white/5 backdrop-blur-xl border-r border-white/10 p-6 min-h-[100vh]">
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-indigo-300">
-                Task Space
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Manage tasks for this project
-              </p>
+    <div className="min-h-screen relative bg-[#0d0f18] text-white">
+      <main className="flex-1 p-10">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-[250px]">
+              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                Project Tasks
+              </h1>
+              <p className="text-gray-400 text-sm">To Do · In Progress · Done</p>
             </div>
 
-            {/* SEARCH + QUICK STATS */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="Search tasks..."
-                  className="bg-white/5 border-white/10 text-white"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                />
-                <Button size="sm" onClick={() => setOpen(true)}>
-                  + New
-                </Button>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                <div className="text-sm text-gray-300">Quick Stats</div>
-                <div className="mt-3 space-y-2 text-sm text-gray-300">
-                  <div className="flex justify-between">
-                    <span>Total tasks</span>
-                    <span>{tasks.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>In progress</span>
-                    <span>
-                      {
-                        tasks.filter(
-                          (t) =>
-                            t.status === "IN_PROGRESS" || t.status === "REVIEW"
-                        ).length
-                      }
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Completed</span>
-                    <span>
-                      {tasks.filter((t) => t.status === "DONE").length}
-                    </span>
-                  </div>
-                </div>
-              </div>
+            <div className="flex-1">
+              <Input
+                placeholder="Search tasks..."
+                className="bg-[#202232] border-white/10 text-white"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
             </div>
 
-            {/* CHART & INSIGHTS */}
-            <FairnessChart tasks={tasks} />
-            <Insights />
+            <Button
+              className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white"
+              onClick={() => setOpen(true)}
+            >
+              + New Task
+            </Button>
           </div>
-        </aside>
 
-        {/* MAIN */}
-        <main className="flex-1 p-10">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-extrabold bg-linear-to-r from-indigo-400 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  Project Tasks
-                </h1>
-                <p className="text-gray-400">To Do · In Progress · Done</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Button onClick={fetchTasks}>Refresh</Button>
-                <Button onClick={() => setOpen(true)}>+ New Task</Button>
-              </div>
+          {/* ⬇️ UPDATED SIDEBAR WITH QUICK STATS */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3">
+              <TaskBoard
+                tasks={filtered}
+                projectId={projectId}
+                refresh={fetchTasks}
+              />
             </div>
 
-            <TaskBoard
-              tasks={filtered}
-              projectId={projectId}
-              refresh={fetchTasks}
-            />
+            <div className="space-y-6">
+              <FairnessChart tasks={tasks} />
+              <QuickStats tasks={tasks} /> {/* Added */}
+            </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       <CreateTaskModal
         open={open}

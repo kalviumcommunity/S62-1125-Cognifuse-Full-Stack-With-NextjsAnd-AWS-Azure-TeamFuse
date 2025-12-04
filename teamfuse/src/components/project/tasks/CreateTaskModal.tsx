@@ -1,181 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-
-// interface MemberWithUser {
-//   user: {
-//     id: string;
-//     name: string | null;
-//   };
-// }
-
-// interface CreateTaskModalProps {
-//   open: boolean;
-//   setOpen: (v: boolean) => void;
-//   projectId: string;
-//   refresh: () => void;
-// }
-
-// export default function CreateTaskModal({
-//   open,
-//   setOpen,
-//   projectId,
-//   refresh,
-// }: CreateTaskModalProps) {
-//   const [members, setMembers] = useState<MemberWithUser[]>([]);
-//   const [form, setForm] = useState({
-//     title: "",
-//     description: "",
-//     weight: 1,
-//     priority: "MEDIUM",
-//     assigneeId: "",
-//   });
-
-//   useEffect(() => {
-//     if (!open || !projectId) return;
-
-//     (async () => {
-//       try {
-//         const res = await fetch(`/api/projects/${projectId}/members`);
-//         if (res.ok) {
-//           const data = await res.json();
-//           setMembers(data);
-//         }
-//       } catch (e) {
-//         console.error("MEMBERS FETCH ERROR:", e);
-//       }
-//     })();
-//   }, [open, projectId]);
-
-//   if (!open) return null;
-
-//   const create = async () => {
-//     if (!projectId) return;
-
-//     try {
-//       await fetch(`/api/projects/${projectId}/tasks`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(form),
-//       });
-//       setOpen(false);
-//       refresh();
-//     } catch (e) {
-//       console.error("CREATE TASK ERROR:", e);
-//     }
-//   };
-
-//   return (
-//     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center px-4">
-//       <div className="w-full max-w-2xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-2xl p-8">
-//         {/* HEADER */}
-//         <div className="flex justify-between items-center mb-4">
-//           <h3 className="text-2xl font-semibold bg-gradient-to-r from-indigo-300 to-purple-300 text-transparent bg-clip-text">
-//             Create Task
-//           </h3>
-//           <button
-//             onClick={() => setOpen(false)}
-//             className="text-gray-300 hover:text-white transition"
-//           >
-//             ✕
-//           </button>
-//         </div>
-
-//         {/* FORM */}
-//         <div className="space-y-5">
-//           <Input
-//             placeholder="Title"
-//             className="bg-white/10 border-white/20 text-white"
-//             value={form.title}
-//             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-//           />
-
-//           <textarea
-//             className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-gray-400 h-28"
-//             placeholder="Description"
-//             value={form.description}
-//             onChange={(e) =>
-//               setForm((f) => ({ ...f, description: e.target.value }))
-//             }
-//           />
-
-//           <div className="flex gap-4">
-//             <Input
-//               type="number"
-//               min={1}
-//               className="w-24 bg-white/10 border-white/20 text-white"
-//               value={form.weight}
-//               onChange={(e) =>
-//                 setForm((f) => ({
-//                   ...f,
-//                   weight: Number(e.target.value || 1),
-//                 }))
-//               }
-//             />
-
-//             <select
-//               className="bg-[#1a1c25]/80 text-white border border-white/20 rounded-xl px-3 py-2 backdrop-blur-xl hover:bg-white/10 transition"
-//               value={form.priority}
-//               onChange={(e) =>
-//                 setForm((f) => ({ ...f, priority: e.target.value }))
-//               }
-//             >
-//               <option className="bg-[#0f111a] text-white" value="LOW">
-//                 Low
-//               </option>
-//               <option className="bg-[#0f111a] text-white" value="MEDIUM">
-//                 Medium
-//               </option>
-//               <option className="bg-[#0f111a] text-white" value="HIGH">
-//                 High
-//               </option>
-//             </select>
-
-//             <select
-//               className="flex-1 bg-[#1a1c25]/80 text-white border border-white/20 rounded-xl px-3 py-2 backdrop-blur-xl hover:bg-white/10 transition"
-//               value={form.assigneeId}
-//               onChange={(e) =>
-//                 setForm((f) => ({ ...f, assigneeId: e.target.value }))
-//               }
-//             >
-//               <option className="bg-[#0f111a] text-white" value="">
-//                 Unassigned
-//               </option>
-//               {members.map((m, i) => (
-//                 <option
-//                   key={`${m.user.id}-${i}`}
-//                   className="bg-[#0f111a] text-white"
-//                   value={m.user.id}
-//                 >
-//                   {m.user.name ?? "Unnamed"}
-//                 </option>
-//               ))}
-//             </select>
-//           </div>
-
-//           <div className="flex justify-end gap-3 pt-4">
-//             <Button
-//               variant="outline"
-//               className="border-white/20 text-gray-200 hover:bg-white/10"
-//               onClick={() => setOpen(false)}
-//             >
-//               Cancel
-//             </Button>
-//             <Button
-//               className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white shadow-lg shadow-purple-600/30"
-//               onClick={create}
-//             >
-//               Create Task
-//             </Button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -183,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface MemberLite {
-  id: string;
-  name: string | null;
+  user:{
+    id: string;
+    name: string | null;
+  }
 }
 
 interface CreateTaskModalProps {
@@ -201,6 +25,7 @@ export default function CreateTaskModal({
   refresh,
 }: CreateTaskModalProps) {
   const [members, setMembers] = useState<MemberLite[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(true);
 
   const [form, setForm] = useState({
     title: "",
@@ -213,31 +38,46 @@ export default function CreateTaskModal({
   useEffect(() => {
     if (!open || !projectId) return;
 
-    (async () => {
+    const loadMembers = async () => {
       try {
         const res = await fetch(`/api/projects/${projectId}/members`);
+        const data = await res.json();
 
-        if (res.ok) {
-          const data: MemberLite[] = await res.json();
-          setMembers(data);
+        if (Array.isArray(data.data)) {
+          setMembers(data.data);
+        } else {
+          console.warn("Unexpected members response:", data);
+          setMembers([]);
         }
       } catch (error) {
         console.error("MEMBERS FETCH ERROR:", error);
+        setMembers([]);
+      } finally {
+        setLoadingMembers(false);
       }
-    })();
+    };
+
+    loadMembers();
   }, [open, projectId]);
 
   if (!open) return null;
 
   const create = async () => {
-    if (!projectId) return;
-
     try {
-      await fetch(`/api/projects/${projectId}/tasks`, {
+      const res = await fetch(`/api/projects/${projectId}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
+      if(!res.ok) {
+        console.error("CREATE TASK FAILED:", await res.text());
+        return;
+      }
+
+      const data = await res.json();
+
+      console.log("TASK CREATED:", data);
 
       setOpen(false);
       refresh();
@@ -248,105 +88,119 @@ export default function CreateTaskModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-2xl p-8">
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl font-semibold bg-gradient-to-r from-indigo-300 to-purple-300 text-transparent bg-clip-text">
-            Create Task
-          </h3>
-          <button
-            onClick={() => setOpen(false)}
-            className="text-gray-300 hover:text-white transition"
+      <div className="w-full max-w-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-2xl p-8">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h3 className="text-2xl font-semibold bg-gradient-to-r from-indigo-300 to-purple-300 text-transparent bg-clip-text">
+              Create New Task
+            </h3>
+            <p className="text-sm text-gray-400 mt-1">Add a new task to your project</p>
+          </div>
+          <button 
+            onClick={() => setOpen(false)} 
+            className="text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full"
           >
-            ✕
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        {/* FORM */}
-        <div className="space-y-5">
-          <Input
-            placeholder="Title"
-            className="bg-[#1a1c25]/90 border-white/20 text-white placeholder:text-gray-400"
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          />
-
-          <textarea
-            className="w-full p-3 bg-[#1a1c25]/90 border border-white/20 rounded-xl text-white placeholder:text-gray-400 h-28 focus:bg-[#1a1c25]/90"
-            placeholder="Description"
-            value={form.description}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, description: e.target.value }))
-            }
-          />
-
-          <div className="flex gap-4">
+        {/* Form */}
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Task Title</label>
             <Input
-              type="number"
-              min={1}
-              className="w-24 bg-[#1a1c25]/90 border-white/20 text-white"
-              value={form.weight}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  weight: Number(e.target.value || 1),
-                }))
-              }
+              placeholder="Enter task title"
+              className="bg-gray-800/50 border-gray-600/50 text-white placeholder:text-gray-500 focus:border-indigo-500/50 transition-colors"
+              value={form.title}
+              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             />
-
-            <select
-              className="bg-[#1a1c25]/90 text-white border border-white/20 rounded-xl px-3 py-2 backdrop-blur-xl focus:bg-[#1a1c25]/90 hover:bg-white/10 transition"
-              value={form.priority}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, priority: e.target.value }))
-              }
-            >
-              <option className="bg-[#0f111a]" value="LOW">
-                Low
-              </option>
-              <option className="bg-[#0f111a]" value="MEDIUM">
-                Medium
-              </option>
-              <option className="bg-[#0f111a]" value="HIGH">
-                High
-              </option>
-            </select>
-
-            <select
-              className="flex-1 bg-[#1a1c25]/90 text-white border border-white/20 rounded-xl px-3 py-2 backdrop-blur-xl focus:bg-[#1a1c25]/90 hover:bg-white/10 transition"
-              value={form.assigneeId}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, assigneeId: e.target.value }))
-              }
-            >
-              <option className="bg-[#0f111a]" value="">
-                Unassigned
-              </option>
-
-              {members.map((m) => (
-                <option key={m.id} className="bg-[#0f111a]" value={m.id}>
-                  {m.name ?? "Unnamed"}
-                </option>
-              ))}
-            </select>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              variant="outline"
-              className="border-white/20 text-gray-200 hover:bg-white/10"
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+            <textarea
+              className="w-full p-3 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder:text-gray-500 focus:border-indigo-500/50 transition-colors h-32"
+              placeholder="Describe the task details..."
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+            />
+          </div>
+
+          {/* Priority / Weight / Assignee */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Weight */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Weight</label>
+              <Input
+                type="number"
+                min={1}
+                className="bg-gray-800/50 border-gray-600/50 text-white"
+                value={form.weight}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, weight: Number(e.target.value || 1) }))
+                }
+              />
+            </div>
+
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+              <select
+                className="w-full bg-gray-800/50 text-white border border-gray-600/50 rounded-lg px-3 py-2 focus:border-indigo-500/50 transition-colors"
+                value={form.priority}
+                onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value }))}
+              >
+                <option value="LOW" className="bg-gray-800">Low</option>
+                <option value="MEDIUM" className="bg-gray-800">Medium</option>
+                <option value="HIGH" className="bg-gray-800">High</option>
+              </select>
+            </div>
+
+            {/* Assignee */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Assignee</label>
+              <select
+                className="w-full bg-gray-800/50 text-white border border-gray-600/50 rounded-lg px-3 py-2 focus:border-indigo-500/50 transition-colors"
+                value={form.assigneeId}
+                onChange={(e) => setForm((f) => ({ ...f, assigneeId: e.target.value }))}
+                disabled={loadingMembers}
+              >
+                <option value="" className="bg-gray-800">Unassigned</option>
+                {!loadingMembers && Array.isArray(members) &&
+                  members.map((m) => (
+                    <option key={m.user.id} value={m.user.id} className="bg-gray-800">
+                      {m.user.name ?? "Unnamed"}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
+            <Button 
+              variant="outline" 
+              className="border-gray-600/50 text-gray-30 bg-gray-800/50 hover:text-white hover:border-gray-500 transition-all px-6"
               onClick={() => setOpen(false)}
             >
               Cancel
             </Button>
-            <Button
-              className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white shadow-lg shadow-purple-600/30"
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-purple-500/20 px-6"
               onClick={create}
             >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
               Create Task
             </Button>
           </div>
         </div>
+
       </div>
     </div>
   );

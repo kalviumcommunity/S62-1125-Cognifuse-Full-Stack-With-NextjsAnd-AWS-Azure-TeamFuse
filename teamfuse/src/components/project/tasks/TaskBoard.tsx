@@ -2,111 +2,79 @@
 
 "use client";
 
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+export type StatusColumn = "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  weight: number;
+  priority: string;
+  status: StatusColumn;
+  projectId: string;
+  assignee?: {
+    name?: string;
+  };
+}
+
 import TaskCard from "./TaskCard";
 
-interface TaskBoardProps {
+interface Props {
   tasks: any[];
   projectId: string;
   refresh: () => void;
 }
 
-const STATUS_KEYS = ["TODO", "IN_PROGRESS", "DONE"] as const;
-type StatusKey = (typeof STATUS_KEYS)[number];
+export default function TaskBoard({ tasks, refresh }: Props) {
+  const columns = [
+    { title: "To Do", status: "TODO" },
+    { title: "In Progress", status: "IN_PROGRESS" },
+    { title: "Under Review", status: "REVIEW" },
+    { title: "Done", status: "DONE" },
+  ];
 
-const COLUMN_CONFIG: { key: StatusKey; label: string }[] = [
-  { key: "TODO", label: "To Do" },
-  { key: "IN_PROGRESS", label: "In Progress" },
-  { key: "DONE", label: "Done" },
-];
-
-export default function TaskBoard({
-  tasks,
-  projectId,
-  refresh,
-}: TaskBoardProps) {
-  const groups: Record<StatusKey, any[]> = {
-    TODO: tasks.filter((t) => t.status === "TODO"),
-    IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
-    DONE: tasks.filter((t) => t.status === "DONE"),
+  const grouped: Record<string, any[]> = {
+    TODO: [],
+    IN_PROGRESS: [],
+    REVIEW: [],
+    DONE: [],
   };
 
-  async function updateStatus(taskId: string, status: StatusKey) {
-    await fetch(`/api/projects/${projectId}/tasks/${taskId}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    refresh();
-  }
-
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-    const newStatus = result.destination.droppableId as StatusKey;
-    updateStatus(result.draggableId, newStatus);
-  };
+  tasks?.forEach((t) => {
+    if (t?.status && grouped[t.status]) {
+      grouped[t.status].push(t);
+    }
+  });
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {COLUMN_CONFIG.map((col) => (
-          <Column
-            key={col.key}
-            droppableId={col.key}
-            title={col.label}
-            tasks={groups[col.key]}
-          />
-        ))}
-      </div>
-    </DragDropContext>
-  );
-}
-
-function Column({
-  droppableId,
-  title,
-  tasks,
-}: {
-  droppableId: StatusKey;
-  title: string;
-  tasks: any[];
-}) {
-  return (
-    <Droppable droppableId={droppableId}>
-      {(provided) => (
+    <div className="grid grid-cols-2 gap-6 mt-6 task-board-scroll">
+      {columns.map((col) => (
         <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          className="bg-white/10 border border-white/10 rounded-xl p-5 min-h-[550px] backdrop-blur-xl"
+          key={col.status}
+          className="bg-gradient-to-b from-white/10 to-white/[0.05]
+          border border-white/15 backdrop-blur-xl rounded-xl shadow-xl p-5
+          flex flex-col h-[420px]"
         >
-          <h3 className="text-xl font-semibold text-indigo-200 mb-4">
-            {title}
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-indigo-200 tracking-wide">
+              {col.title}
+            </h2>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20 text-gray-300">
+              {grouped[col.status].length} tasks
+            </span>
+          </div>
 
-          <div className="space-y-4">
-            {tasks.length === 0 && (
-              <p className="text-gray-400 text-sm">No tasks</p>
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+            {grouped[col.status].length === 0 ? (
+              <p className="text-xs text-gray-400 text-center mt-10">No tasks</p>
+            ) : (
+              grouped[col.status].map((task) => (
+                <TaskCard key={task.id} task={task} onTaskUpdated={refresh} />
+              ))
             )}
-
-            {tasks.map((task, index) => (
-              <Draggable key={task.id} draggableId={task.id} index={index}>
-                {(dragProvided) => (
-                  <div
-                    {...dragProvided.draggableProps}
-                    {...dragProvided.dragHandleProps}
-                    ref={dragProvided.innerRef}
-                    className="transition-transform hover:scale-[1.02]"
-                  >
-                    <TaskCard task={task} />
-                  </div>
-                )}
-              </Draggable>
-            ))}
-
-            {provided.placeholder}
           </div>
         </div>
-      )}
-    </Droppable>
+      ))}
+    </div>
   );
 }

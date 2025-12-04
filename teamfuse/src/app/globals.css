@@ -123,3 +123,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Custom Scrollbar Style */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(136,91,255,0.85), rgba(75,55,212,0.75));
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(185,143,255,0.95), rgba(112,89,255,0.9));
+}
