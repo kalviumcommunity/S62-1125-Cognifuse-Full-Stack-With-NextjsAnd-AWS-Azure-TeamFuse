@@ -12,6 +12,8 @@ import { getGitHubToken } from "@/lib/github/getGitHubToken";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { getAllProjectsForUser } from "@/lib/services/projectServices";
 import { ensureGithubWebhookForProject } from "@/lib/github/registerWebhook";
+import { invalidateUserProjectCache } from "@/lib/cache/userProjectCache";
+import { prisma } from "@/lib/prisma";
 
 type EmptyParams = Record<string, never>;
 
@@ -65,6 +67,27 @@ export async function POST(
 
       if (Array.isArray(members) && members.length > 0) {
         await inviteExistingUsers(project.id, members);
+
+        const users = await prisma.user.findMany({
+          where: { email: { in: members } },
+          select: {
+            id: true,
+          },
+        });
+
+        await Promise.all(
+          Array.from(users).map(async (u) => {
+            try {
+              await invalidateUserProjectCache(u.id);
+            } catch (err) {
+              console.error(
+                `Failed to invalidate userProjectCache for ${u.id}`,
+                err
+              );
+              // swallow error so invalidation failure doesn't break the API response
+            }
+          })
+        );
       }
 
       return sendSuccess(project, "Project created successfully", 201);

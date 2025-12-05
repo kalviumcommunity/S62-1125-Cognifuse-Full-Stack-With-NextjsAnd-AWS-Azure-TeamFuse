@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   app:
-    build: ./teamfuse
+    build:
+      context: ./teamfuse
+      dockerfile: Dockerfile.app
     container_name: nextjs_app
     ports:
       - "3000:3000"
@@ -23,8 +25,9 @@ services:
       start_period: 10s
 
   sync_worker:
-    build: ./teamfuse
-    container_name: worker_1
+    build:
+      context: ./teamfuse
+      dockerfile: Dockerfile.worker
     command: ["npm", "run", "sync_worker"]
     env_file:
       - .env
@@ -34,12 +37,11 @@ services:
     restart: unless-stopped
     networks:
       - localnet
-    healthcheck:
-      test: ["CMD-SHELL", "exit 0"] # lightweight placeholder; replace if you have a health probe
 
   webhook_worker:
-    build: ./teamfuse
-    container_name: worker_2
+    build:
+      context: ./teamfuse
+      dockerfile: Dockerfile.worker
     command: ["npm", "run", "webhook_worker"]
     env_file:
       - .env
@@ -49,8 +51,6 @@ services:
     restart: unless-stopped
     networks:
       - localnet
-    healthcheck:
-      test: ["CMD-SHELL", "exit 0"]
 
   db:
     image: postgres:15-alpine

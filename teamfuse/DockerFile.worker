@@ -1,0 +1,16 @@
+FROM node:20
+WORKDIR /app
+
+# Install deps
+COPY package*.json ./
+RUN npm install
+
+# Prisma client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copy full code
+COPY . .
+
+# No CMD here!
+# The correct command is passed from docker-compose

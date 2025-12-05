@@ -1,11 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
-
-  // Turbopack now works automatically. "root" is deprecated.
-  // If you want to force Turbopack:
-  // default is auto based on dev/build command
 
   images: {
     remotePatterns: [
@@ -20,11 +15,16 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // TypeScript settings (tsconfigPath is not needed unless you use a custom file)
   typescript: {
     ignoreBuildErrors: false,
   },
+
   typedRoutes: true,
+
+  // Force Next.js to treat THIS folder as the root
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;
