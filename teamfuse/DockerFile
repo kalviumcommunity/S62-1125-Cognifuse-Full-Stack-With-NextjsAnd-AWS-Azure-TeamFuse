@@ -3,9 +3,12 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install 
 
 COPY . .
 
-# Start both workers
-CMD ["npx", "tsx", "runWorkers.js"]
+RUN npx prisma generate
+
+ENV PATH=/app/node_modules/.bin:$PATH
+
+CMD ["npm", "run", "start:workers"]
